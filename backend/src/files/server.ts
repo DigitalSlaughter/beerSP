@@ -11,12 +11,12 @@ const app = express();
 app.use(express.json());
 
 // Rutas
-app.use("/usuarios", usuarioRoutes);
-app.use("/cervezas", cervezaRoutes);
-app.use("/degustaciones", degustacionRoutes);
-app.use("/solicitudes", solicitudRoutes);
-app.use("/locales", localRoutes);
-app.use("/auth", authRoutes);
+app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/cervezas", cervezaRoutes);
+app.use("/api/degustaciones", degustacionRoutes);
+app.use("/api/solicitudes", solicitudRoutes);
+app.use("/api/locales", localRoutes);
+app.use("/api/auth", authRoutes);
 
 const PORT = 4000;
 
