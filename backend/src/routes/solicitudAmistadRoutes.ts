@@ -1,0 +1,1 @@
+// solicitudAmistadRoutes.ts
