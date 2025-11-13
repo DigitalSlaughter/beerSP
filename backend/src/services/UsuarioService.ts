@@ -9,7 +9,7 @@ export class UsuarioService {
   }
 
   async obtenerUsuarioPorId(id: number): Promise<Usuario | null> {
-    return await UsuarioRepository.findOne({ where: { id }, relations: ["galardones", "degustaciones"] });
+    return await UsuarioRepository.findOne({ where: { id }, relations: ["degustaciones"] });
   }
 
   async actualizarUsuario(id: number, datos: Partial<Usuario>): Promise<Usuario | null> {

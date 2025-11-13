@@ -5,6 +5,7 @@ import cervezaRoutes from "../routes/cervezaRoutes";
 import degustacionRoutes from "../routes/degustacionRoutes";
 import solicitudRoutes from "../routes/solicitudAmistadRoutes";
 import localRoutes from "../routes/localRoutes";
+import authRoutes from "../routes/authRoutes";
 
 const app = express();
 app.use(express.json());
@@ -15,6 +16,7 @@ app.use("/cervezas", cervezaRoutes);
 app.use("/degustaciones", degustacionRoutes);
 app.use("/solicitudes", solicitudRoutes);
 app.use("/locales", localRoutes);
+app.use("/auth", authRoutes);
 
 const PORT = 4000;
 
