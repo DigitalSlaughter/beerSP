@@ -6,6 +6,7 @@ import Register from "../pages/Register";
 import Profile from "../pages/Profile";
 import Degustaciones from "../pages/Degustaciones";
 import ProtectedRoute from "../components/ProtectedRoute";
+import VerifyEmail from "../pages/VerifyEmail";
 
 const AppRoutes: React.FC = () => {
   const token = localStorage.getItem("token");
@@ -15,6 +16,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/" element={token ? <Navigate to="/home" replace /> : <Navigate to="/register" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/verify/:token" element={<VerifyEmail />} />
 
       {/* Rutas protegidas */}
       <Route

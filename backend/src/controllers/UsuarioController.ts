@@ -9,8 +9,8 @@ export class UsuarioController {
     try {
       const usuario = await usuarioService.crearUsuario(req.body);
       res.status(201).json(usuario);
-    } catch (error) {
-      res.status(400).json({ mensaje: "Error al crear usuario", error });
+    } catch (error: any) {
+      res.status(400).json({ mensaje: "Error al crear usuario", error: error.message });
     }
   }
 
@@ -38,5 +38,28 @@ export class UsuarioController {
   async listarUsuarios(req: Request, res: Response) {
     const usuarios = await usuarioService.listarUsuarios();
     res.json(usuarios);
+  }
+
+  // -----------------------------
+  // NUEVAS FUNCIONES DE VERIFICACIÓN
+  // -----------------------------
+  async verificarUsuario(req: Request, res: Response) {
+    const { token } = req.params;
+    try {
+      const usuario = await usuarioService.verificarUsuario(token);
+      res.json({ mensaje: "Cuenta verificada correctamente", usuario });
+    } catch (error: any) {
+      res.status(400).json({ mensaje: error.message });
+    }
+  }
+
+  async reenviarVerificacion(req: Request, res: Response) {
+    const { correo } = req.body;
+    try {
+      await usuarioService.reenviarEmailVerificacion(correo);
+      res.json({ mensaje: "Correo de verificación enviado correctamente" });
+    } catch (error: any) {
+      res.status(400).json({ mensaje: error.message });
+    }
   }
 }

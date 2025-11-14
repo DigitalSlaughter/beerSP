@@ -25,6 +25,9 @@ export class Usuario {
 
   @Column({ default: false })
     validada!: boolean;
+  
+  @Column({ nullable: true })
+  tokenVerificacion?: string;
 
   @Column({ nullable: true })
     foto!: string;

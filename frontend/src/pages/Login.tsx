@@ -12,7 +12,7 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:4000/auth/login", { email, password });
+      const res = await axios.post("http://localhost:4000/api/auth/login", { email, password });
       localStorage.setItem("token", res.data.token);
       navigate("/home"); // Redirigir al home
     } catch (err: any) {
