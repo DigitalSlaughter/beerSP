@@ -21,7 +21,7 @@ export class Usuario {
     correo!: string;
 
   @Column()
-    contraseña!: string;
+    password!: string;
 
   @Column({ default: false })
     validada!: boolean;
@@ -33,7 +33,7 @@ export class Usuario {
     foto!: string;
 
   @Column({ nullable: true })
-    ubicación!: string;
+    ubicacion!: string;
 
   @Column({ nullable: true })
     nombre!: string;
@@ -42,7 +42,7 @@ export class Usuario {
     apellidos!: string;
 
   @Column({ nullable: true })
-    texto_introducción!: string;
+    texto_introduccion!: string;
 
   // Relaciones
   @OneToMany(() => SolicitudAmistad, (solicitud) => solicitud.usuario1)

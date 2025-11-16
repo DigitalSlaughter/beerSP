@@ -27,7 +27,7 @@ export class AuthService {
     }
 
     // Verificación de contraseña
-    if (usuario.contraseña !== password) {
+    if (usuario.password !== password) {
       console.warn("[AuthService] Contraseña incorrecta para:", email);
       throw new Error("Contraseña incorrecta");
     }

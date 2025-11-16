@@ -1,5 +1,5 @@
 // src/pages/Register.tsx
-import React, { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
@@ -7,15 +7,21 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
 
   // Estados
-  const [step, setStep] = useState<1 | 2>(1); // 1 = edad, 2 = registro
+  const [step, setStep] = useState<1 | 2>(1);
   const [fechaNacimiento, setFechaNacimiento] = useState("");
   const [nombre, setNombre] = useState("");
+  const [nombreReal, setNombreReal] = useState(""); // <-- Nuevo campo opcional
+  const [apellidos, setApellidos] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [ubicacion, setUbicacion] = useState("");
+  const [introduccion, setIntroduccion] = useState("");
+  const [foto, setFoto] = useState<File | null>(null);
+  const [showOpcionales, setShowOpcionales] = useState(false);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
-  const [showResend, setShowResend] = useState(false); // Nuevo: permite reenviar correo
+  const [showResend, setShowResend] = useState(false);
 
   const calcularEdad = (fecha: string) => {
     const hoy = new Date();
@@ -51,30 +57,44 @@ const Register: React.FC = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:4000/api/usuarios", {
-        nombre_usuario: nombre,
-        correo: email,
-        fecha_nacimiento: fechaNacimiento,
-        contraseña: password,
-      });
+      const formData = new FormData();
+      formData.append("nombre_usuario", nombre);
+      formData.append("correo", email);
+      formData.append("password", password);
 
-      console.log("Respuesta de la API:", response.data);
+      // Campos opcionales
+      if (nombreReal) formData.append("nombre", nombreReal); 
+      if (apellidos) formData.append("apellidos", apellidos);
+      if (ubicacion) formData.append("ubicacion", ubicacion);
+      if (introduccion) formData.append("texto_introduccion", introduccion);
+      if (foto) formData.append("foto", foto);
+
+      const response = await axios.post(
+        "http://localhost:4000/api/usuarios",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
 
       setInfo(
         "Registro exitoso. Te hemos enviado un correo de verificación. Revisa tu bandeja de entrada."
       );
-      setShowResend(true); // Mostrar opción de reenviar
+      setShowResend(true);
 
-      // Limpieza opcional
+      // Limpiar formulario
       setNombre("");
+      setNombreReal("");
+      setApellidos("");
+      setEmail("");
       setPassword("");
       setConfirmPassword("");
+      setUbicacion("");
+      setIntroduccion("");
+      setFoto(null);
 
     } catch (err: any) {
       console.error("❌ Error:", err);
       setError(err.response?.data?.message || "Error al registrar usuario");
 
-      // Si el backend avisa que ya existe una cuenta no verificada
       if (
         err.response?.data?.message?.toLowerCase().includes("verificar") ||
         err.response?.data?.message?.toLowerCase().includes("no verificada")
@@ -84,7 +104,6 @@ const Register: React.FC = () => {
     }
   };
 
-  // 👉 Nuevo método: reenviar verificación
   const handleResendVerification = async () => {
     setError("");
     setInfo("");
@@ -95,18 +114,17 @@ const Register: React.FC = () => {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/usuarios/verify/resend",
-        { correo: email }
-      );
-
+      await axios.post("http://localhost:4000/api/usuarios/verify/resend", { correo: email });
       setInfo("Correo de verificación reenviado. Revisa tu bandeja.");
-
     } catch (err: any) {
       console.error("❌ Error al reenviar:", err);
-      setError(
-        err.response?.data?.message || "No se pudo reenviar el correo."
-      );
+      setError(err.response?.data?.message || "No se pudo reenviar el correo.");
+    }
+  };
+
+  const handleFotoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFoto(e.target.files[0]);
     }
   };
 
@@ -116,7 +134,6 @@ const Register: React.FC = () => {
       {error && <p className="text-red-500">{error}</p>}
       {info && <p className="text-green-500">{info}</p>}
 
-      {/* Paso 1 = verificación de edad */}
       {step === 1 && (
         <form onSubmit={handleCheckAge} className="flex flex-col gap-4">
           <input
@@ -135,7 +152,6 @@ const Register: React.FC = () => {
         </form>
       )}
 
-      {/* Paso 2 = formulario de registro */}
       {step === 2 && (
         <form onSubmit={handleRegister} className="flex flex-col gap-4">
           <input
@@ -170,6 +186,53 @@ const Register: React.FC = () => {
             className="border p-2 rounded"
             required
           />
+
+          <button
+            type="button"
+            onClick={() => setShowOpcionales(!showOpcionales)}
+            className="text-sm text-blue-600 underline mb-2"
+          >
+            {showOpcionales ? "Ocultar campos opcionales" : "Mostrar campos opcionales"}
+          </button>
+
+          {showOpcionales && (
+            <>
+              <input
+                type="text"
+                placeholder="Nombre real (opcional)"
+                value={nombreReal}
+                onChange={(e) => setNombreReal(e.target.value)}
+                className="border p-2 rounded"
+              />
+              <input
+                type="text"
+                placeholder="Apellidos (opcional)"
+                value={apellidos}
+                onChange={(e) => setApellidos(e.target.value)}
+                className="border p-2 rounded"
+              />
+              <input
+                type="text"
+                placeholder="Ubicación (opcional)"
+                value={ubicacion}
+                onChange={(e) => setUbicacion(e.target.value)}
+                className="border p-2 rounded"
+              />
+              <textarea
+                placeholder="Texto de introducción (opcional)"
+                value={introduccion}
+                onChange={(e) => setIntroduccion(e.target.value)}
+                className="border p-2 rounded"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFotoChange}
+                className="border p-2 rounded"
+              />
+            </>
+          )}
+
           <button
             type="submit"
             className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-500"
@@ -179,7 +242,6 @@ const Register: React.FC = () => {
         </form>
       )}
 
-      {/* BOTÓN PARA REENVIAR CORREO */}
       {showResend && (
         <button
           onClick={handleResendVerification}
