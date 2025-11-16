@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config(); // carga archivo de configuracion para mandar correo
 import express from "express";
 import cors from "cors";
 import { AppDataSource } from "../config/db";
