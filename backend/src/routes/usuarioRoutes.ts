@@ -10,8 +10,9 @@ const upload = multer({ dest: "uploads/" }); // Puedes reemplazar "uploads/" con
 
 // Ruta de creación de usuario con foto opcional
 router.post("/", upload.single("foto"), usuarioController.crearUsuario);
+router.get("/:id/degustaciones", usuarioController.listarDegustaciones);
 router.get("/:id", usuarioController.obtenerUsuario);
-router.put("/:id", usuarioController.actualizarUsuario);
+router.put("/:id", upload.single("foto"), usuarioController.actualizarUsuario);
 router.delete("/:id", usuarioController.eliminarUsuario);
 router.get("/", usuarioController.listarUsuarios);
 

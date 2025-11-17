@@ -14,10 +14,10 @@ export class Cerveza {
     estilo!: string;
 
   @Column()
-    país_procedencia!: string;
+    pais_procedencia!: string;
 
   @Column()
-    tamaño!: string;
+    size!: string;
 
   @Column()
     formato!: string;
@@ -32,7 +32,7 @@ export class Cerveza {
     color!: string;
 
   @Column({ type: "text", nullable: true })
-    descripción!: string;
+    descripcion!: string;
 
   @Column({ nullable: true })
     foto!: string;

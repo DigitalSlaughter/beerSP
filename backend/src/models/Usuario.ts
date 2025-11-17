@@ -25,21 +25,30 @@ export class Usuario {
 
   @Column({ default: false })
     validada!: boolean;
-  
+
   @Column({ nullable: true })
-  tokenVerificacion?: string;
+    tokenVerificacion?: string;
 
   @Column({ nullable: true })
     foto!: string;
-
-  @Column({ nullable: true })
-    ubicacion!: string;
 
   @Column({ nullable: true })
     nombre!: string;
 
   @Column({ nullable: true })
     apellidos!: string;
+
+  @Column({ nullable: true })
+    ubicacion!: string;
+
+  @Column({ nullable: true })
+    genero!: string;
+
+  @Column({ nullable: true })
+    pais!: string;
+
+  @Column({ nullable: true })
+    fecha_nacimiento!: string;
 
   @Column({ nullable: true })
     texto_introduccion!: string;
@@ -55,6 +64,5 @@ export class Usuario {
     degustaciones!: Degustacion[];
 
   // Galardones (EIF): solo en memoria, no se persiste
-     galardones?: Galardon[];
+    galardones?: Galardon[];
 }
-

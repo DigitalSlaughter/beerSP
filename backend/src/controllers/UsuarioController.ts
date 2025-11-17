@@ -30,6 +30,34 @@ export class UsuarioController {
       });
     }
   }
+  async listarDegustaciones(req: Request, res: Response) {
+    console.log("[listarDegustaciones] req.params:", req.params);
+    console.log("[listarDegustaciones] req.url:", req.url);
+    console.log("[listarDegustaciones] req.method:", req.method);
+
+    const usuarioId = Number(req.params.id); // Debe coincidir con :id en la ruta
+    console.log("[listarDegustaciones] usuarioId convertido a Number:", usuarioId);
+
+    if (isNaN(usuarioId)) {
+      console.warn("[listarDegustaciones] ID de usuario inválido");
+      return res.status(400).json({ mensaje: "ID de usuario inválido" });
+    }
+
+    try {
+      const degustaciones = await usuarioService.listarDegustacionesUsuario(usuarioId);
+
+      if (!degustaciones) {
+        console.warn("[listarDegustaciones] Usuario no encontrado con ID:", usuarioId);
+        return res.status(404).json({ mensaje: "Usuario no encontrado" });
+      }
+
+      console.log("[listarDegustaciones] Degustaciones obtenidas:", degustaciones.length);
+      res.json(degustaciones);
+    } catch (error: any) {
+      console.error("[listarDegustaciones] Error al listar degustaciones:", error);
+      res.status(500).json({ mensaje: "Error al listar degustaciones", error: error.message });
+    }
+  }
 
   async obtenerUsuario(req: Request, res: Response) {
     const { id } = req.params;
@@ -40,14 +68,21 @@ export class UsuarioController {
     res.json(usuario);
   }
 
-  async actualizarUsuario(req: Request, res: Response) {
-    const { id } = req.params;
-    const usuario = await usuarioService.actualizarUsuario(Number(id), req.body);
+ async actualizarUsuario(req: Request, res: Response) {
+  const { id } = req.params;
+  const datos: any = { ...req.body };
 
-    if (!usuario) return res.status(404).json({ mensaje: "Usuario no encontrado" });
-
-    res.json(usuario);
+  if (req.file) {
+    datos.foto = req.file.filename; // o la URL donde guardes la foto
   }
+
+  const usuario = await usuarioService.actualizarUsuario(Number(id), datos);
+
+  if (!usuario) return res.status(404).json({ mensaje: "Usuario no encontrado" });
+
+  res.json(usuario);
+}
+
 
   async eliminarUsuario(req: Request, res: Response) {
     const { id } = req.params;
