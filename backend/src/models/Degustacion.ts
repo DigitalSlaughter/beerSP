@@ -25,7 +25,7 @@ export class Degustacion {
     local!: Local;
 
   @Column({ type: "float", nullable: true })
-    puntuación!: number;
+    puntuacion!: number;
 
   @Column({ type: "text", nullable: true })
     comentario!: string;
@@ -34,7 +34,7 @@ export class Degustacion {
     fecha!: Date;
 
   @Column()
-    país_degustación!: string;
+    pais_degustacion!: string;
 
   @Column({ default: false })
     me_gusta!: boolean;

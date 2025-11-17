@@ -1,4 +1,5 @@
 import { UsuarioRepository } from "../repositories/UsuarioRepository";
+import { DegustacionRepository } from "../repositories/DegustacionRepository";
 import { Usuario } from "../models/Usuario";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
@@ -26,6 +27,17 @@ export class UsuarioService {
       throw new Error("No se pudo crear el usuario: " + error.message);
     }
   }
+async listarDegustacionesUsuario(usuarioId: number) {
+    const usuario = await UsuarioRepository.findOne({ where: { id: usuarioId } });
+    if (!usuario) return null;
+
+    const degustaciones = await DegustacionRepository.find({
+      where: { usuario: { id: usuarioId } },
+      relations: ["cerveza", "local"]
+    });
+
+    return degustaciones;
+  }
 
   async obtenerUsuarioPorId(id: number): Promise<Usuario | null> {
     return await UsuarioRepository.findOne({
@@ -34,14 +46,26 @@ export class UsuarioService {
     });
   }
 
-  async actualizarUsuario(id: number, datos: Partial<Usuario>): Promise<Usuario | null> {
-    const usuario = await this.obtenerUsuarioPorId(id);
-    if (!usuario) return null;
+async actualizarUsuario(id: number, datos: Partial<Usuario>): Promise<Usuario | null> {
+  const usuario = await this.obtenerUsuarioPorId(id);
+  if (!usuario) return null;
 
-    UsuarioRepository.merge(usuario, datos);
+  // Campos obligatorios que nunca se deben borrar
+  const camposObligatorios = ["nombre_usuario", "correo"];
 
-    return await UsuarioRepository.save(usuario);
+  // Recorrer todos los campos recibidos
+  for (const key in datos) {
+    if (Object.prototype.hasOwnProperty.call(datos, key)) {
+      // Solo actualizar campos opcionales si vienen en datos (incluso si es "")
+      if (!camposObligatorios.includes(key)) {
+        (usuario as any)[key] = (datos as any)[key];
+      }
+    }
   }
+
+  return await UsuarioRepository.save(usuario);
+}
+
 
   async eliminarUsuario(id: number): Promise<boolean> {
     const result = await UsuarioRepository.delete(id);
