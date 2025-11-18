@@ -315,12 +315,12 @@ const DegustacionModal: React.FC<Props> = ({ onClose, onSuccess }) => {
           <input
             type="number"
             min={0}
-            max={10}
+            max={5}
             value={puntuacion ?? ""}
             onChange={(e) =>
               setPuntuacion(e.target.value === "" ? null : Number(e.target.value))
             }
-            placeholder="Puntuación (0-10)"
+            placeholder="Puntuación (0-5)"
             className="border p-2 rounded"
           />
           <textarea
@@ -363,17 +363,167 @@ const DegustacionModal: React.FC<Props> = ({ onClose, onSuccess }) => {
               >
                 ✖
               </button>
-              <input placeholder="Nombre" value={nuevaCerveza.nombre_cerveza} onChange={e => setNuevaCerveza({...nuevaCerveza, nombre_cerveza: e.target.value})} className="border p-2 rounded"/>
-              <input placeholder="Estilo" value={nuevaCerveza.estilo} onChange={e => setNuevaCerveza({...nuevaCerveza, estilo: e.target.value})} className="border p-2 rounded"/>
-              <input placeholder="País de procedencia" value={nuevaCerveza.pais_procedencia} onChange={e => setNuevaCerveza({...nuevaCerveza, pais_procedencia: e.target.value})} className="border p-2 rounded"/>
-              <input placeholder="Tamaño" value={nuevaCerveza.size} onChange={e => setNuevaCerveza({...nuevaCerveza, size: e.target.value})} className="border p-2 rounded"/>
-              <input placeholder="Formato" value={nuevaCerveza.formato} onChange={e => setNuevaCerveza({...nuevaCerveza, formato: e.target.value})} className="border p-2 rounded"/>
-              <input placeholder="% Alcohol" type="number" value={nuevaCerveza.porcentaje_alcohol} onChange={e => setNuevaCerveza({...nuevaCerveza, porcentaje_alcohol: parseFloat(e.target.value)})} className="border p-2 rounded"/>
-              <input placeholder="Amargor" type="number" value={nuevaCerveza.amargor} onChange={e => setNuevaCerveza({...nuevaCerveza, amargor: parseFloat(e.target.value)})} className="border p-2 rounded"/>
-              <input placeholder="Color" value={nuevaCerveza.color} onChange={e => setNuevaCerveza({...nuevaCerveza, color: e.target.value})} className="border p-2 rounded"/>
-              <textarea placeholder="Descripción" value={nuevaCerveza.descripcion} onChange={e => setNuevaCerveza({...nuevaCerveza, descripcion: e.target.value})} className="border p-2 rounded"/>
-              <input type="file" onChange={e => e.target.files && setFotoNuevaCerveza(e.target.files[0])} />
-              <button onClick={handleCrearCerveza} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">Crear</button>
+
+              {/* NOMBRE */}
+              <select
+                value={nuevaCerveza.nombre_cerveza}
+                onChange={(e) =>
+                  setNuevaCerveza({ ...nuevaCerveza, nombre_cerveza: e.target.value })
+                }
+                className="border p-2 rounded"
+              >
+                <option value="">Selecciona una cerveza</option>
+                <option value="Mahou">Mahou</option>
+                <option value="Estrella Galicia">Estrella Galicia</option>
+                <option value="Heineken">Heineken</option>
+                <option value="Ambar">Ambar</option>
+                <option value="Alhambra">Alhambra</option>
+                <option value="San Miguel">San Miguel</option>
+                <option value="Cruzcampo">Cruzcampo</option>
+                <option value="Budweiser">Budweiser</option>
+                <option value="Guinness">Guinness</option>
+              </select>
+              {/* ESTILO */}
+              <select
+                value={nuevaCerveza.estilo}
+                onChange={(e) =>
+                  setNuevaCerveza({ ...nuevaCerveza, estilo: e.target.value })
+                }
+                className="border p-2 rounded"
+              >
+                <option value="">Seleccionar estilo</option>
+                <option>Lager</option>
+                <option>Pilsner</option>
+                <option>IPA</option>
+                <option>Pale Ale</option>
+                <option>Stout</option>
+                <option>Porter</option>
+                <option>Trigo</option>
+                <option>Sour</option>
+              </select>
+
+              {/* PAÍS */}
+              <select
+                value={nuevaCerveza.pais_procedencia}
+                onChange={(e) =>
+                  setNuevaCerveza({
+                    ...nuevaCerveza,
+                    pais_procedencia: e.target.value,
+                  })
+                }
+                className="border p-2 rounded"
+              >
+                <option value="">País de procedencia</option>
+                <option>España</option>
+                <option>Alemania</option>
+                <option>Bélgica</option>
+                <option>Estados Unidos</option>
+                <option>México</option>
+                <option>Irlanda</option>
+                <option>Países Bajos</option>
+                <option>República Checa</option>
+              </select>
+
+              {/* TAMAÑO */}
+              <select
+                value={nuevaCerveza.size}
+                onChange={(e) =>
+                  setNuevaCerveza({ ...nuevaCerveza, size: e.target.value })
+                }
+                className="border p-2 rounded"
+              >
+                <option value="">Tamaño</option>
+                <option>250 ml</option>
+                <option>330 ml</option>
+                <option>500 ml</option>
+                <option>1 L</option>
+                <option>2 L</option>
+              </select>
+
+              {/* FORMATO */}
+              <select
+                value={nuevaCerveza.formato}
+                onChange={(e) =>
+                  setNuevaCerveza({ ...nuevaCerveza, formato: e.target.value })
+                }
+                className="border p-2 rounded"
+              >
+                <option value="">Formato</option>
+                <option>Botella</option>
+                <option>Lata</option>
+                <option>Barril</option>
+              </select>
+
+              {/* ALCOHOL */}
+              <input
+                placeholder="% Alcohol"
+                type="number"
+                value={nuevaCerveza.porcentaje_alcohol}
+                onChange={(e) =>
+                  setNuevaCerveza({
+                    ...nuevaCerveza,
+                    porcentaje_alcohol: parseFloat(e.target.value),
+                  })
+                }
+                className="border p-2 rounded"
+              />
+
+              {/* AMARGOR */}
+              <input
+                placeholder="Amargor"
+                type="number"
+                value={nuevaCerveza.amargor}
+                onChange={(e) =>
+                  setNuevaCerveza({
+                    ...nuevaCerveza,
+                    amargor: parseFloat(e.target.value),
+                  })
+                }
+                className="border p-2 rounded"
+              />
+
+              {/* COLOR */}
+              <select
+                value={nuevaCerveza.color}
+                onChange={(e) =>
+                  setNuevaCerveza({ ...nuevaCerveza, color: e.target.value })
+                }
+                className="border p-2 rounded"
+              >
+                <option value="">Color</option>
+                <option>Rubio</option>
+                <option>Ámbar</option>
+                <option>Tostado</option>
+                <option>Negro</option>
+              </select>
+
+              {/* DESCRIPCIÓN */}
+              <textarea
+                placeholder="Descripción"
+                value={nuevaCerveza.descripcion}
+                onChange={(e) =>
+                  setNuevaCerveza({
+                    ...nuevaCerveza,
+                    descripcion: e.target.value,
+                  })
+                }
+                className="border p-2 rounded"
+              />
+
+              {/* FOTO */}
+              <input
+                type="file"
+                onChange={(e) =>
+                  e.target.files && setFotoNuevaCerveza(e.target.files[0])
+                }
+              />
+
+              <button
+                onClick={handleCrearCerveza}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500"
+              >
+                Crear
+              </button>
             </div>
           </div>
         )}
@@ -389,14 +539,49 @@ const DegustacionModal: React.FC<Props> = ({ onClose, onSuccess }) => {
               >
                 ✖
               </button>
-              <input placeholder="Nombre" value={nuevoLocal.nombre_local} onChange={e => setNuevoLocal({...nuevoLocal, nombre_local: e.target.value})} className="border p-2 rounded"/>
-              <input placeholder="Dirección" value={nuevoLocal.direccion} onChange={e => setNuevoLocal({...nuevoLocal, direccion: e.target.value})} className="border p-2 rounded"/>
-              <input placeholder="Coordenadas" value={nuevoLocal.coordenadas} onChange={e => setNuevoLocal({...nuevoLocal, coordenadas: e.target.value})} className="border p-2 rounded"/>
+
+              <input
+                placeholder="Nombre"
+                value={nuevoLocal.nombre_local}
+                onChange={(e) =>
+                  setNuevoLocal({ ...nuevoLocal, nombre_local: e.target.value })
+                }
+                className="border p-2 rounded"
+              />
+              <input
+                placeholder="Dirección"
+                value={nuevoLocal.direccion}
+                onChange={(e) =>
+                  setNuevoLocal({ ...nuevoLocal, direccion: e.target.value })
+                }
+                className="border p-2 rounded"
+              />
+              <input
+                placeholder="Coordenadas"
+                value={nuevoLocal.coordenadas}
+                onChange={(e) =>
+                  setNuevoLocal({ ...nuevoLocal, coordenadas: e.target.value })
+                }
+                className="border p-2 rounded"
+              />
+
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={nuevoLocal.me_gusta} onChange={e => setNuevoLocal({...nuevoLocal, me_gusta: e.target.checked})} />
+                <input
+                  type="checkbox"
+                  checked={nuevoLocal.me_gusta}
+                  onChange={(e) =>
+                    setNuevoLocal({ ...nuevoLocal, me_gusta: e.target.checked })
+                  }
+                />
                 ¿Te gusta?
               </label>
-              <button onClick={handleCrearLocal} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">Crear</button>
+
+              <button
+                onClick={handleCrearLocal}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500"
+              >
+                Crear
+              </button>
             </div>
           </div>
         )}
