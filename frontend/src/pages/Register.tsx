@@ -10,7 +10,7 @@ const Register: React.FC = () => {
   const [step, setStep] = useState<1 | 2>(1);
   const [fechaNacimiento, setFechaNacimiento] = useState("");
   const [nombre, setNombre] = useState("");
-  const [nombreReal, setNombreReal] = useState(""); // <-- Nuevo campo opcional
+  const [nombreReal, setNombreReal] = useState(""); 
   const [apellidos, setApellidos] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

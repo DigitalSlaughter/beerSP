@@ -9,12 +9,11 @@ import { Local } from "../models/Local";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: "localhost",
-  port: 5432,
-  username: "postgres",
-  password: "root",
-  database: "beersp",
-  synchronize: true, // cambiar a false en producción
+  url: process.env.DATABASE_URL, 
+  ssl: {
+    rejectUnauthorized: false,     // <--- requerido por Neon
+  },
+  synchronize: true, // esto borra/cambia tablas si los modelos cambian
   logging: false,
   entities: [Usuario, SolicitudAmistad, Cerveza, Degustacion, Local],
 });
