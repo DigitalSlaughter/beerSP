@@ -25,7 +25,6 @@ interface DecodedToken {
   exp: number;
 }
 
-// Función para decodificar JWT sin librerías externas
 function decodeJWT(token: string): DecodedToken {
   const payload = token.split(".")[1];
   const decodedJson = atob(payload);
@@ -35,8 +34,10 @@ function decodeJWT(token: string): DecodedToken {
 const Profile: React.FC = () => {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [foto, setFoto] = useState<File | null>(null);
+  const [fotoOriginal, setFotoOriginal] = useState<string | undefined>(undefined);
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
+  const [fotoModal, setFotoModal] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUsuario = async () => {
@@ -50,6 +51,7 @@ const Profile: React.FC = () => {
           { withCredentials: true }
         );
         setUsuario(response.data);
+        setFotoOriginal(response.data.foto);
       } catch (err: any) {
         console.error("Error al obtener usuario:", err);
         setError("No se pudo cargar la información del usuario.");
@@ -82,7 +84,6 @@ const Profile: React.FC = () => {
       formData.append("nombre_usuario", usuario.nombre_usuario);
       formData.append("correo", usuario.correo);
 
-      // Campos opcionales, incluso si están vacíos
       const opcionales: (keyof Usuario)[] = [
         "nombre",
         "apellidos",
@@ -90,15 +91,17 @@ const Profile: React.FC = () => {
         "genero",
         "pais",
         "fecha_nacimiento",
-        "texto_introduccion"
+        "texto_introduccion",
       ];
-
       opcionales.forEach((campo) => {
         const valor = usuario[campo];
         formData.append(campo, valor !== undefined && valor !== null ? String(valor) : "");
       });
 
-      if (foto) formData.append("foto", foto);
+      // Solo enviar foto si se seleccionó un archivo nuevo
+      if (foto) {
+        formData.append("foto", foto);
+      }
 
       const response = await axios.put(
         `http://localhost:4000/api/usuarios/${usuario.id}`,
@@ -109,6 +112,7 @@ const Profile: React.FC = () => {
       setInfo("Perfil actualizado correctamente.");
       setUsuario(response.data);
       setFoto(null);
+      setFotoOriginal(response.data.foto);
     } catch (err: any) {
       console.error("Error al actualizar perfil:", err);
       setError(err.response?.data?.error || "No se pudo actualizar el perfil.");
@@ -116,6 +120,12 @@ const Profile: React.FC = () => {
   };
 
   if (!usuario) return <div>Cargando...</div>;
+
+  const fotoUrl = foto
+    ? URL.createObjectURL(foto)
+    : usuario.foto
+    ? usuario.foto
+    : undefined;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -135,6 +145,7 @@ const Profile: React.FC = () => {
             required
             className="border p-2 rounded"
           />
+
           <div className="flex gap-2 items-center">
             <input
               type="text"
@@ -249,12 +260,27 @@ const Profile: React.FC = () => {
               onChange={handleFotoChange}
               className="border p-2 rounded"
             />
-            {usuario.foto && !foto && (
+
+            {fotoUrl && (
               <img
-                src={`http://localhost:4000/${usuario.foto}`}
+                src={fotoUrl}
                 alt="Perfil"
-                className="mt-2 w-32 h-32 object-cover rounded-full"
+                className="mt-2 w-32 h-32 object-cover rounded-full cursor-pointer hover:opacity-80 transition"
+                onClick={() => setFotoModal(fotoUrl)}
               />
+            )}
+
+            {fotoModal && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+                onClick={() => setFotoModal(null)}
+              >
+                <img
+                  src={fotoModal}
+                  alt="Perfil ampliada"
+                  className="max-w-[90%] max-h-[90%] rounded"
+                />
+              </div>
             )}
           </div>
 

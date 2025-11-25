@@ -1,3 +1,4 @@
+import { deleteFromR2 } from "../files/r2Delete";
 import { UsuarioRepository } from "../repositories/UsuarioRepository";
 import { DegustacionRepository } from "../repositories/DegustacionRepository";
 import { Usuario } from "../models/Usuario";
@@ -46,25 +47,35 @@ async listarDegustacionesUsuario(usuarioId: number) {
     });
   }
 
-async actualizarUsuario(id: number, datos: Partial<Usuario>): Promise<Usuario | null> {
-  const usuario = await this.obtenerUsuarioPorId(id);
-  if (!usuario) return null;
+  async actualizarUsuario(id: number, datos: Partial<Usuario>): Promise<Usuario | null> {
+    const usuario = await this.obtenerUsuarioPorId(id);
+    if (!usuario) return null;
 
-  // Campos obligatorios que nunca se deben borrar
-  const camposObligatorios = ["nombre_usuario", "correo"];
+    // Campos que nunca deben ser borrados
+    const camposObligatorios = ["nombre_usuario", "correo"];
 
-  // Recorrer todos los campos recibidos
-  for (const key in datos) {
-    if (Object.prototype.hasOwnProperty.call(datos, key)) {
-      // Solo actualizar campos opcionales si vienen en datos (incluso si es "")
-      if (!camposObligatorios.includes(key)) {
-        (usuario as any)[key] = (datos as any)[key];
+    // Si viene una nueva foto: borrar la anterior (si existía)
+    if (datos.foto) {
+      if (usuario.foto) {
+        await deleteFromR2(usuario.foto);
+      }
+      usuario.foto = datos.foto; // asignar nueva key
+    }
+
+    // Recorrer todos los campos recibidos (excepto foto que ya tratamos)
+    for (const key in datos) {
+      if (
+        Object.prototype.hasOwnProperty.call(datos, key) &&
+        key !== "foto" // evitar procesar foto dos veces
+      ) {
+        if (!camposObligatorios.includes(key)) {
+          (usuario as any)[key] = (datos as any)[key];
+        }
       }
     }
-  }
 
-  return await UsuarioRepository.save(usuario);
-}
+    return await UsuarioRepository.save(usuario);
+  }
 
 
   async eliminarUsuario(id: number): Promise<boolean> {

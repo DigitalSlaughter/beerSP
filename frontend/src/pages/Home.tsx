@@ -7,7 +7,7 @@ import axios from "axios";
 interface UsuarioResumen {
   id?: number;
   nombre_usuario: string;
-  foto?: string;
+  foto?: string; // URL firmada generada por el backend
   numDegustaciones?: number;
   numLocalesNuevos?: number;
   solicitudesPendientes?: number;
@@ -54,10 +54,11 @@ const Home: React.FC = () => {
   const [galardones, setGalardones] = useState<Galardon[]>([]);
   const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
-
-  // Modal de degustaciones del usuario
   const [degustacionesUsuario, setDegustacionesUsuario] = useState<DegustacionUsuario[]>([]);
   const [modalDegustacionesOpen, setModalDegustacionesOpen] = useState(false);
+
+  // 🔥 NUEVO: imagen ampliada
+  const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDatos = async () => {
@@ -65,18 +66,21 @@ const Home: React.FC = () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
+        const decoded: any = JSON.parse(atob(token.split(".")[1]));
+        const usuarioId = decoded.id;
+
         const [resUsuario, resActividades, resCervezas, resGalardones] = await Promise.all([
-          axios.get("http://localhost:4000/api/usuarios", { withCredentials: true }).catch(() => null),
+          axios.get(`http://localhost:4000/api/usuarios/${usuarioId}`, { withCredentials: true }),
           axios.get("http://localhost:4000/api/actividades/recientes", { withCredentials: true }).catch(() => ({ data: [] })),
           axios.get("http://localhost:4000/api/cervezas/favoritas", { withCredentials: true }).catch(() => ({ data: [] })),
           axios.get("http://localhost:4000/api/galardones", { withCredentials: true }).catch(() => ({ data: [] })),
         ]);
 
-        if (resUsuario && resUsuario.data) setUsuarioResumen(resUsuario.data);
-        if (resActividades && resActividades.data) setActividades(resActividades.data);
-        if (resCervezas && resCervezas.data) setCervezasFavoritas(resCervezas.data);
-        if (resGalardones && resGalardones.data) setGalardones(resGalardones.data);
-      } catch (err: any) {
+        if (resUsuario?.data) setUsuarioResumen(resUsuario.data);
+        if (resActividades?.data) setActividades(resActividades.data);
+        if (resCervezas?.data) setCervezasFavoritas(resCervezas.data);
+        if (resGalardones?.data) setGalardones(resGalardones.data);
+      } catch (err) {
         console.error("Error cargando datos inicio:", err);
         setError("No se pudo cargar la información de inicio.");
       }
@@ -88,19 +92,10 @@ const Home: React.FC = () => {
   const handleVerDegustaciones = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        alert("No estás autenticado");
-        return;
-      }
+      if (!token) return alert("No estás autenticado");
 
-      let usuarioId: number;
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        usuarioId = payload.id;
-      } catch {
-        alert("Token inválido");
-        return;
-      }
+      const decoded: any = JSON.parse(atob(token.split(".")[1]));
+      const usuarioId = decoded.id;
 
       const res = await axios.get(
         `http://localhost:4000/api/usuarios/${usuarioId}/degustaciones`,
@@ -109,9 +104,8 @@ const Home: React.FC = () => {
 
       setDegustacionesUsuario(res.data);
       setModalDegustacionesOpen(true);
-
-    } catch (e) {
-      console.error("Error al cargar degustaciones:", e);
+    } catch (err) {
+      console.error("Error al cargar degustaciones:", err);
       alert("No se pudieron cargar las degustaciones.");
     }
   };
@@ -127,17 +121,26 @@ const Home: React.FC = () => {
         <div className="bg-white rounded shadow p-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             {usuarioResumen?.foto ? (
-              <img src={`http://localhost:4000/${usuarioResumen.foto}`} alt="Perfil" className="w-16 h-16 rounded-full object-cover" />
+              <img
+                src={usuarioResumen.foto}
+                alt="Foto de perfil"
+                className="w-16 h-16 rounded-full object-cover cursor-pointer hover:opacity-80 transition"
+                onClick={() => setImagenAmpliada(usuarioResumen.foto ?? null)} // 🔥 NUEVO
+              />
             ) : (
               <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">?</div>
             )}
+
             <div>
               <p className="font-bold">{usuarioResumen?.nombre_usuario || "Usuario"}</p>
               <p>Degustaciones: {usuarioResumen?.numDegustaciones ?? 0}</p>
               <p>Locales nuevos (7 días): {usuarioResumen?.numLocalesNuevos ?? 0}</p>
-              {usuarioResumen?.solicitudesPendientes && usuarioResumen.solicitudesPendientes > 0 && (
-                <p className="text-blue-600">Solicitudes pendientes: {usuarioResumen.solicitudesPendientes}</p>
-              )}
+
+              {usuarioResumen?.solicitudesPendientes ? (
+                <p className="text-blue-600">
+                  Solicitudes pendientes: {usuarioResumen.solicitudesPendientes}
+                </p>
+              ) : null}
             </div>
           </div>
 
@@ -148,6 +151,7 @@ const Home: React.FC = () => {
             >
               Hacer degustación
             </button>
+
             <button
               onClick={handleVerDegustaciones}
               className="bg-gray-100 text-gray-800 px-3 py-2 rounded hover:bg-gray-200"
@@ -157,7 +161,7 @@ const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Panel de actividades recientes */}
+        {/* Actividades */}
         <div className="bg-white rounded shadow p-4">
           <h2 className="font-bold mb-2">Actividades recientes de tus amigos</h2>
           {actividades.length > 0 ? (
@@ -173,7 +177,7 @@ const Home: React.FC = () => {
           )}
         </div>
 
-        {/* Panel de cervezas favoritas */}
+        {/* Cervezas favoritas */}
         <div className="bg-white rounded shadow p-4">
           <h2 className="font-bold mb-2">Tus cervezas favoritas</h2>
           {cervezasFavoritas.length > 0 ? (
@@ -187,7 +191,7 @@ const Home: React.FC = () => {
           )}
         </div>
 
-        {/* Panel de galardones */}
+        {/* Galardones */}
         <div className="bg-white rounded shadow p-4">
           <h2 className="font-bold mb-2">Tus últimos galardones</h2>
           {galardones.length > 0 ? (
@@ -201,13 +205,18 @@ const Home: React.FC = () => {
           )}
         </div>
 
-        {/* Modal / componente de degustación */}
-        {modalOpen && <DegustacionModal onClose={() => setModalOpen(false)} onSuccess={() => {
-          setModalOpen(false);
-          setTimeout(() => window.location.reload(), 300);
-        }} />}
+        {/* Modal degustación */}
+        {modalOpen && (
+          <DegustacionModal
+            onClose={() => setModalOpen(false)}
+            onSuccess={() => {
+              setModalOpen(false);
+              setTimeout(() => window.location.reload(), 300);
+            }}
+          />
+        )}
 
-        {/* Modal degustaciones del usuario */}
+        {/* Modal degustaciones usuario */}
         {modalDegustacionesOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start pt-10 z-50">
             <div className="bg-white w-full max-w-2xl rounded shadow p-4 relative">
@@ -218,6 +227,7 @@ const Home: React.FC = () => {
               >
                 ✖
               </button>
+
               {degustacionesUsuario.length > 0 ? (
                 <ul className="space-y-2 max-h-96 overflow-y-auto">
                   {degustacionesUsuario.map(d => (
@@ -236,9 +246,23 @@ const Home: React.FC = () => {
             </div>
           </div>
         )}
-
       </main>
+
       <Footer />
+
+      {/* 🔥 MODAL DE IMAGEN AMPLIADA */}
+      {imagenAmpliada && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
+          onClick={() => setImagenAmpliada(null)}
+        >
+          <img
+            src={imagenAmpliada}
+            alt="Imagen ampliada"
+            className="max-w-full max-h-full rounded-xl shadow-xl"
+          />
+        </div>
+      )}
     </div>
   );
 };

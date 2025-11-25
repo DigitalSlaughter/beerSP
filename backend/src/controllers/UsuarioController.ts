@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { UsuarioService } from "../services/UsuarioService";
+import { generateSignedUrl } from "../files/r2SignedUrl";
 
 const usuarioService = new UsuarioService();
 
@@ -11,7 +12,7 @@ export class UsuarioController {
 
       // Si hay foto subida por multer
       if (req.file) {
-        usuarioData.foto = req.file.path; // o tu uploader a Firebase/S3
+        usuarioData.foto = (req.file as any).key; // Guardamos el key, no la URL
       }
 
       console.log("[UsuarioController] Petición para crear usuario:", usuarioData);
@@ -59,29 +60,41 @@ export class UsuarioController {
     }
   }
 
-  async obtenerUsuario(req: Request, res: Response) {
-    const { id } = req.params;
-    const usuario = await usuarioService.obtenerUsuarioPorId(Number(id));
-
-    if (!usuario) return res.status(404).json({ mensaje: "Usuario no encontrado" });
-
-    res.json(usuario);
-  }
-
- async actualizarUsuario(req: Request, res: Response) {
+async obtenerUsuario(req: Request, res: Response) {
   const { id } = req.params;
-  const datos: any = { ...req.body };
+  const usuario = await usuarioService.obtenerUsuarioPorId(Number(id));
 
-  if (req.file) {
-    datos.foto = req.file.filename; // o la URL donde guardes la foto
+  if (!usuario) 
+    return res.status(404).json({ mensaje: "Usuario no encontrado" });
+
+  // Si tiene foto almacenada, generamos URL firmada
+  if (usuario.foto) {
+    usuario.foto = await generateSignedUrl(usuario.foto);
   }
-
-  const usuario = await usuarioService.actualizarUsuario(Number(id), datos);
-
-  if (!usuario) return res.status(404).json({ mensaje: "Usuario no encontrado" });
 
   res.json(usuario);
 }
+
+async actualizarUsuario(req: Request, res: Response) {
+    const { id } = req.params;
+    const datos: any = { ...req.body };
+
+    // Nueva imagen subida → guardar la nueva key
+    if (req.file) {
+      datos.foto = (req.file as any).key;
+    }
+
+    const usuario = await usuarioService.actualizarUsuario(Number(id), datos);
+    if (!usuario)
+      return res.status(404).json({ error: "Usuario no encontrado" });
+
+    // Generar signed URL si tiene foto
+    if (usuario.foto) {
+      usuario.foto = await generateSignedUrl(usuario.foto);
+    }
+
+    res.json(usuario);
+  }
 
 
   async eliminarUsuario(req: Request, res: Response) {

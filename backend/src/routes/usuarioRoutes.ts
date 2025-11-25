@@ -1,22 +1,29 @@
 import { Router } from "express";
 import { UsuarioController } from "../controllers/UsuarioController";
-import multer from "multer";
+import { upload } from "../config/r2Multer"; // Multer configurado para R2
 
 const router = Router();
 const usuarioController = new UsuarioController();
 
-// Configuración de multer para subir fotos
-const upload = multer({ dest: "uploads/" }); // Puedes reemplazar "uploads/" con tu storage real
-
 // Ruta de creación de usuario con foto opcional
 router.post("/", upload.single("foto"), usuarioController.crearUsuario);
+
+// Listar degustaciones de un usuario
 router.get("/:id/degustaciones", usuarioController.listarDegustaciones);
+
+// Obtener usuario por ID
 router.get("/:id", usuarioController.obtenerUsuario);
+
+// Actualizar usuario con foto opcional
 router.put("/:id", upload.single("foto"), usuarioController.actualizarUsuario);
+
+// Eliminar usuario
 router.delete("/:id", usuarioController.eliminarUsuario);
+
+// Listar todos los usuarios
 router.get("/", usuarioController.listarUsuarios);
 
-// Rutas de verificación
+// Rutas de verificación de cuenta
 router.get("/verify/:token", usuarioController.verificarUsuario);
 router.post("/verify/resend", usuarioController.reenviarVerificacion);
 

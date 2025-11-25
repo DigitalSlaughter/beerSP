@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Backend (TypeScript)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/backend",          // <-- Directorio de trabajo
+      "runtimeArgs": ["-r", "ts-node/register"],    // <-- Permite ejecutar TypeScript directamente
+      "args": ["src/files/server.ts"],             // <-- Archivo de entrada
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}
