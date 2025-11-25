@@ -10,7 +10,7 @@ const Register: React.FC = () => {
   const [step, setStep] = useState<1 | 2>(1);
   const [fechaNacimiento, setFechaNacimiento] = useState("");
   const [nombre, setNombre] = useState("");
-  const [nombreReal, setNombreReal] = useState(""); // <-- Nuevo campo opcional
+  const [nombreReal, setNombreReal] = useState(""); 
   const [apellidos, setApellidos] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -61,12 +61,13 @@ const Register: React.FC = () => {
       formData.append("nombre_usuario", nombre);
       formData.append("correo", email);
       formData.append("password", password);
-
+      formData.append("fecha_nacimiento", fechaNacimiento);
       // Campos opcionales
       if (nombreReal) formData.append("nombre", nombreReal); 
       if (apellidos) formData.append("apellidos", apellidos);
       if (ubicacion) formData.append("ubicacion", ubicacion);
       if (introduccion) formData.append("texto_introduccion", introduccion);
+      
       if (foto) formData.append("foto", foto);
 
       const response = await axios.post(

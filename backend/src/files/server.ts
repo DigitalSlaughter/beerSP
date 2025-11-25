@@ -34,7 +34,7 @@ const PORT = 4000;
 
 AppDataSource.initialize()
   .then(() => {
-    console.log("Conexión establecida con PostgreSQL");
+    console.log("Conexión establecida con Neon");
     app.listen(PORT, () =>
       console.log(`Servidor en http://localhost:${PORT}`)
     );
