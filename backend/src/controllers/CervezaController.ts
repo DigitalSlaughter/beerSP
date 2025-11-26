@@ -1,14 +1,12 @@
 import { Request, Response } from "express";
 import { CervezaService } from "../services/CervezaService";
+import { generateSignedUrl } from "../files/r2SignedUrl";
 
 const service = new CervezaService();
 
 export class CervezaController {
   crear = async (req: Request, res: Response) => {
     try {
-      console.log("REQ.BODY recibido en backend:", req.body);
-      console.log("REQ.FILE recibido:", req.file);
-
       // Convierte los campos numéricos de string a number si es necesario
       const nuevaCerveza = {
         ...req.body,
@@ -18,9 +16,8 @@ export class CervezaController {
 
       // Si quieres guardar la foto, req.file.buffer contiene el archivo en memoria
       if (req.file) {
-        nuevaCerveza.foto = req.file.buffer.toString("base64"); // o súbelo a Firebase/Cloud
+        nuevaCerveza.foto = (req.file as any).key; // Guardamos el key, no la URL
       }
-
       const cerveza = await service.crear(nuevaCerveza);
 
       res.status(201).json(cerveza);
@@ -33,7 +30,24 @@ export class CervezaController {
   listar = async (req: Request, res: Response) => {
     try {
       const cervezas = await service.listar();
-      res.json(cervezas);
+
+      // --- INICIO DE LA MODIFICACIÓN ---
+      // Usamos Promise.all para esperar a que todas las URLs se generen
+      const cervezasConUrl = await Promise.all(
+        cervezas.map(async (cerveza) => {
+          if (cerveza.foto) {
+            // Devolvemos un nuevo objeto con la propiedad 'foto' actualizada
+            return {
+              ...cerveza,
+              foto: await generateSignedUrl(cerveza.foto)
+            };
+          }
+          return cerveza; // Devuelve la cerveza sin cambios si no tiene foto
+        })
+      );
+      // --- FIN DE LA MODIFICACIÓN ---
+
+      res.json(cervezasConUrl); // Enviamos la lista ya procesada
     } catch (error: any) {
       console.error("Error al listar cervezas:", error);
       res.status(500).json({ mensaje: "Error al listar cervezas", error });
@@ -45,6 +59,9 @@ export class CervezaController {
       const cerveza = await service.obtener(Number(req.params.id));
       if (!cerveza) {
         return res.status(404).json({ mensaje: "Cerveza no encontrada" });
+      }
+      if (cerveza.foto) {
+        cerveza.foto = await generateSignedUrl(cerveza.foto);
       }
       res.json(cerveza);
     } catch (error: any) {

@@ -1,12 +1,9 @@
 import { Router } from "express";
 import { CervezaController } from "../controllers/CervezaController";
-import multer from "multer";
+import { upload } from "../config/r2Multer"; // Multer configurado para R2
 
 const router = Router();
 const controller = new CervezaController();
-
-// Configuración de multer (memoria o disco)
-const upload = multer({ dest: "uploads/" }); // Puedes reemplazar "uploads/" con tu storage real
 
 // POST con multer para recibir FormData
 router.post("/", upload.single("foto"), controller.crear);

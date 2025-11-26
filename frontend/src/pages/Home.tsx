@@ -57,7 +57,6 @@ const Home: React.FC = () => {
   const [degustacionesUsuario, setDegustacionesUsuario] = useState<DegustacionUsuario[]>([]);
   const [modalDegustacionesOpen, setModalDegustacionesOpen] = useState(false);
 
-  // 🔥 NUEVO: imagen ampliada
   const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
   useEffect(() => {
@@ -69,17 +68,21 @@ const Home: React.FC = () => {
         const decoded: any = JSON.parse(atob(token.split(".")[1]));
         const usuarioId = decoded.id;
 
-        const [resUsuario, resActividades, resCervezas, resGalardones] = await Promise.all([
-          axios.get(`http://localhost:4000/api/usuarios/${usuarioId}`, { withCredentials: true }),
-          axios.get("http://localhost:4000/api/actividades/recientes", { withCredentials: true }).catch(() => ({ data: [] })),
-          axios.get("http://localhost:4000/api/cervezas/favoritas", { withCredentials: true }).catch(() => ({ data: [] })),
-          axios.get("http://localhost:4000/api/galardones", { withCredentials: true }).catch(() => ({ data: [] })),
+        const [resUsuario] = await Promise.all([
+          axios.get(`http://localhost:4000/api/usuarios/${usuarioId}`, { withCredentials: true })
         ]);
+        
+         // const [resUsuario, resActividades, resCervezas, resGalardones] = await Promise.all([
+          //axios.get(`http://localhost:4000/api/usuarios/${usuarioId}`, { withCredentials: true }),
+          //axios.get("http://localhost:4000/api/actividades/recientes", { withCredentials: true }).catch(() => ({ data: [] })),
+          //axios.get("http://localhost:4000/api/cervezas/favoritas", { withCredentials: true }).catch(() => ({ data: [] })),
+          //axios.get("http://localhost:4000/api/galardones", { withCredentials: true }).catch(() => ({ data: [] })),
+        //]);
 
         if (resUsuario?.data) setUsuarioResumen(resUsuario.data);
-        if (resActividades?.data) setActividades(resActividades.data);
-        if (resCervezas?.data) setCervezasFavoritas(resCervezas.data);
-        if (resGalardones?.data) setGalardones(resGalardones.data);
+        //if (resActividades?.data) setActividades(resActividades.data);
+        //if (resCervezas?.data) setCervezasFavoritas(resCervezas.data);
+        //if (resGalardones?.data) setGalardones(resGalardones.data);
       } catch (err) {
         console.error("Error cargando datos inicio:", err);
         setError("No se pudo cargar la información de inicio.");
