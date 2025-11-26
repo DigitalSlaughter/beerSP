@@ -1,20 +1,67 @@
 import { Request, Response } from "express";
 import { DegustacionService } from "../services/DegustacionService";
+import { GalardonService } from "../services/GalardonService";
+import { UsuarioRepository } from "../repositories/UsuarioRepository";
 
 const service = new DegustacionService();
+const galardonService = new GalardonService();
 
 export class DegustacionController {
   crear = async (req: Request, res: Response) => {
-    console.log("[CREAR] Body recibido:", req.body);
-    try {
-      const degustacion = await service.crear(req.body);
-      console.log("[CREAR] Degustación creada:", degustacion);
-      res.status(201).json(degustacion);
-    } catch (error) {
-      console.error("[CREAR] Error al crear degustación:", error);
-      res.status(400).json({ mensaje: "Error al crear degustación", error });
+  console.log("[CREAR] Body recibido:", req.body);
+  try {
+    // 1. Crear la degustación
+    const degustacion = await service.crear(req.body);
+    console.log("[CREAR] Degustación creada:", degustacion);
+
+    // 2. Obtener usuario con degustaciones, cervezas y galardones asignados
+    const usuario = await UsuarioRepository.findOne({
+      where: { id: degustacion.usuario.id },
+      relations: ["degustaciones", "degustaciones.cerveza", "galardonesAsignados"]
+    });
+
+    if (!usuario) {
+      console.warn("[CREAR] Usuario no encontrado para galardón");
+      return res.status(404).json({ mensaje: "Usuario no encontrado para galardón" });
     }
-  };
+
+    // 3. Contar degustaciones únicas por cerveza
+    const cervezasUnicas = new Set(usuario.degustaciones.map(d => d.cerveza.id));
+    const cantidadCervezas = cervezasUnicas.size;
+
+    // 4. Contar países únicos de degustación (para otro galardón)
+    const paisesUnicos = new Set(usuario.degustaciones.map(d => d.pais_degustacion));
+    const cantidadPaises = paisesUnicos.size;
+
+    // 5. Asignar o actualizar galardón de primera degustación
+    const galardonPrimera = galardonService.obtenerGalardonDef("primera_degustacion");
+    if (galardonPrimera) {
+      const nivel = galardonService.calcularNivel(usuario.degustaciones.length, galardonPrimera);
+      await galardonService.asignarGalardon(usuario, "primera_degustacion", nivel);
+    }
+
+    // 6. Asignar o actualizar galardón "cervezas_distintas" según cervezas únicas
+    const galardonCervezas = galardonService.obtenerGalardonDef("cervezas_distintas");
+    if (galardonCervezas) {
+      const nivel = galardonService.calcularNivel(cantidadCervezas, galardonCervezas);
+      await galardonService.asignarGalardon(usuario, "cervezas_distintas", nivel);
+    }
+
+    // 7. Asignar o actualizar galardón "paises_distintos" según países únicos
+    const galardonPaises = galardonService.obtenerGalardonDef("paises_distintos");
+    if (galardonPaises) {
+      const nivel = galardonService.calcularNivel(cantidadPaises, galardonPaises);
+      await galardonService.asignarGalardon(usuario, "paises_distintos", nivel);
+    }
+    res.status(201).json(degustacion);
+  } catch (error) {
+    console.error("[CREAR] Error al crear degustación:", error);
+    res.status(400).json({ mensaje: "Error al crear degustación", error });
+  }
+};
+
+
+
 
   listar = async (req: Request, res: Response) => {
     console.log("[LISTAR] Solicitud de lista de degustaciones");

@@ -1,0 +1,68 @@
+{
+  "galardones": [
+    {
+      "id": "cervezas_distintas",
+      "nombre": "Catador",
+      "descripcion": "Por degustar cervezas diferentes.",
+      "niveles": [
+        { "nivel": 1, "requisito": 2 },
+        { "nivel": 2, "requisito": 5 },
+        { "nivel": 3, "requisito": 10 }
+      ]
+    },
+    {
+      "id": "paises_distintos",
+      "nombre": "Viajero Cervecero",
+      "descripcion": "Por probar cervezas de distintos países.",
+      "niveles": [
+        { "nivel": 1, "requisito": 2 },
+        { "nivel": 2, "requisito": 5 },
+        { "nivel": 3, "requisito": 10 }
+      ]
+    },
+    {
+      "id": "comentarios",
+      "nombre": "Comentarista",
+      "descripcion": "Por comentar degustaciones de otros usuarios.",
+      "niveles": [
+        { "nivel": 1, "requisito": 2 },
+        { "nivel": 2, "requisito": 5 },
+        { "nivel": 3, "requisito": 10 }
+      ]
+    },
+    {
+      "id": "locales_visitados",
+      "nombre": "Trotabarras",
+      "descripcion": "Por degustar cervezas en distintos locales.",
+      "niveles": [
+        { "nivel": 1, "requisito": 3 },
+        { "nivel": 2, "requisito": 7 },
+        { "nivel": 3, "requisito": 15 }
+      ]
+    },
+    {
+      "id": "primer_inicio",
+      "nombre": "¡Bienvenido!",
+      "descripcion": "Por crear tu cuenta en la plataforma.",
+      "niveles": [
+        { "nivel": 1, "requisito": 1 }
+      ]
+    },
+    {
+      "id": "primer_comentario",
+      "nombre": "Primer Comentario",
+      "descripcion": "Por realizar tu primer comentario.",
+      "niveles": [
+        { "nivel": 1, "requisito": 1 }
+      ]
+    },
+    {
+      "id": "primera_degustacion",
+      "nombre": "Primera Degustación",
+      "descripcion": "Por registrar tu primera degustación.",
+      "niveles": [
+        { "nivel": 1, "requisito": 1 }
+      ]
+    }
+  ]
+}

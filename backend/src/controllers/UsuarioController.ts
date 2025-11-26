@@ -1,36 +1,50 @@
 import { Request, Response } from "express";
 import { UsuarioService } from "../services/UsuarioService";
 import { generateSignedUrl } from "../files/r2SignedUrl";
+import { GalardonService } from "../services/GalardonService";
+import { UsuarioRepository } from "../repositories/UsuarioRepository";
 
+const galardonService = new GalardonService();
 const usuarioService = new UsuarioService();
 
 export class UsuarioController {
   async crearUsuario(req: Request, res: Response) {
-    try {
-      // Tomamos los campos del body
-      const usuarioData = { ...req.body };
+  try {
+    // 1. Tomamos los campos del body
+    const usuarioData = { ...req.body };
 
-      // Si hay foto subida por multer
-      if (req.file) {
-        usuarioData.foto = (req.file as any).key; // Guardamos el key, no la URL
-      }
-
-      console.log("[UsuarioController] Petición para crear usuario:", usuarioData);
-
-      const usuario = await usuarioService.crearUsuario(usuarioData);
-
-      console.log("[UsuarioController] Usuario creado correctamente:", usuario.id);
-
-      res.status(201).json(usuario);
-    } catch (error: any) {
-      console.error("[UsuarioController] Error creando usuario:", error.message);
-
-      res.status(400).json({
-        mensaje: "Error al crear usuario",
-        error: error.message
-      });
+    // 2. Si hay foto subida por multer
+    if (req.file) {
+      usuarioData.foto = (req.file as any).key; // Guardamos el key, no la URL
     }
+
+    console.log("[UsuarioController] Petición para crear usuario:", usuarioData);
+
+    // 3. Crear usuario
+    const usuario = await usuarioService.crearUsuario(usuarioData);
+
+    // 4. Asignar galardón de creación de cuenta
+    await galardonService.asignarGalardonEvento(usuario, "crear_cuenta");
+
+    // 5. Recargar usuario con galardones para devolverlo completo
+    const usuarioConGalardones = await UsuarioRepository.findOne({
+      where: { id: usuario.id },
+      relations: ["galardonesAsignados"]
+    });
+
+    console.log("[UsuarioController] Usuario creado correctamente:", usuario.id);
+
+    res.status(201).json(usuarioConGalardones);
+  } catch (error: any) {
+    console.error("[UsuarioController] Error creando usuario:", error.message);
+
+    res.status(400).json({
+      mensaje: "Error al crear usuario",
+      error: error.message
+    });
   }
+}
+
   async listarDegustaciones(req: Request, res: Response) {
     console.log("[listarDegustaciones] req.params:", req.params);
     console.log("[listarDegustaciones] req.url:", req.url);

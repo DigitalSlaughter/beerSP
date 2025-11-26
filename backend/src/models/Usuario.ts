@@ -7,7 +7,7 @@ import {
 } from "typeorm";
 import { SolicitudAmistad } from "./SolicitudAmistad";
 import { Degustacion } from "./Degustacion";
-import { Galardon } from "./Galardon";
+import { UsuarioGalardon } from "./UsuarioGalardon";
 
 @Entity("usuarios")
 export class Usuario {
@@ -63,6 +63,6 @@ export class Usuario {
   @OneToMany(() => Degustacion, (deg) => deg.usuario)
     degustaciones!: Degustacion[];
 
-  // Galardones (EIF): solo en memoria, no se persiste
-    galardones?: Galardon[];
+  @OneToMany(() => UsuarioGalardon, (ug) => ug.usuario)
+  galardonesAsignados!: UsuarioGalardon[];
 }
