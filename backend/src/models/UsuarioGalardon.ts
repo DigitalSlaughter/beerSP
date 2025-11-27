@@ -8,13 +8,19 @@ export class UsuarioGalardon {
   id!: number;
 
   @Column()
-  galardonId!: string; // ID del catálogo EIF
+  galardonId!: string; // ID del catálogo EIF o identificador interno
 
   @Column()
   nivel!: number;
 
   @Column()
   fecha_obtencion!: Date;
+
+  @Column({ nullable: true })
+  foto?: string;
+
+  @Column({ type: "text", nullable: true })
+  descripcion?: string;
 
   @ManyToOne(() => Usuario, (user) => user.galardonesAsignados)
   usuario!: Usuario;

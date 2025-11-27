@@ -3,66 +3,78 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
+  OneToMany
 } from "typeorm";
 import { SolicitudAmistad } from "./SolicitudAmistad";
 import { Degustacion } from "./Degustacion";
 import { UsuarioGalardon } from "./UsuarioGalardon";
+import { ComentarioDegustacion } from "./ComentarioDegustacion";
+import { LikeLocal } from "./LikeLocal";
 
 @Entity("usuarios")
 export class Usuario {
   @PrimaryGeneratedColumn()
-    id!: number;
+  id!: number;
 
   @Column({ unique: true })
-    nombre_usuario!: string;
+  nombre_usuario!: string;
 
   @Column({ unique: true })
-    correo!: string;
+  correo!: string;
 
   @Column()
-    password!: string;
+  password!: string;
 
   @Column({ default: false })
-    validada!: boolean;
+  validada!: boolean;
 
   @Column({ nullable: true })
-    tokenVerificacion?: string;
+  tokenVerificacion?: string;
 
   @Column({ nullable: true })
-    foto!: string;
+  foto!: string;
 
   @Column({ nullable: true })
-    nombre!: string;
+  nombre!: string;
 
   @Column({ nullable: true })
-    apellidos!: string;
+  apellidos!: string;
 
   @Column({ nullable: true })
-    ubicacion!: string;
+  ubicacion!: string;
 
   @Column({ nullable: true })
-    genero!: string;
+  genero!: string;
 
   @Column({ nullable: true })
-    pais!: string;
+  pais!: string;
 
   @Column({ nullable: true })
-    fecha_nacimiento!: string;
+  fecha_nacimiento!: string;
 
   @Column({ nullable: true })
-    texto_introduccion!: string;
+  texto_introduccion!: string;
 
-  // Relaciones
-  @OneToMany(() => SolicitudAmistad, (solicitud) => solicitud.usuario1)
-    solicitudesEnviadas!: SolicitudAmistad[];
+  // -------------------------------
+  // RELACIONES
+  // -------------------------------
 
-  @OneToMany(() => SolicitudAmistad, (solicitud) => solicitud.usuario2)
-    solicitudesRecibidas!: SolicitudAmistad[];
+  @OneToMany(() => SolicitudAmistad, solicitud => solicitud.usuario1)
+  solicitudesEnviadas!: SolicitudAmistad[];
 
-  @OneToMany(() => Degustacion, (deg) => deg.usuario)
-    degustaciones!: Degustacion[];
+  @OneToMany(() => SolicitudAmistad, solicitud => solicitud.usuario2)
+  solicitudesRecibidas!: SolicitudAmistad[];
 
-  @OneToMany(() => UsuarioGalardon, (ug) => ug.usuario)
+  @OneToMany(() => Degustacion, deg => deg.usuario)
+  degustaciones!: Degustacion[];
+
+  @OneToMany(() => UsuarioGalardon, ug => ug.usuario)
   galardonesAsignados!: UsuarioGalardon[];
+
+  // Comentarios realizados por el usuario
+  @OneToMany(() => ComentarioDegustacion, (comentario) => comentario.usuario)
+  comentariosDegustacion!: ComentarioDegustacion[];
+
+  @OneToMany(() => LikeLocal, (like) => like.usuario)
+  likesLocal!: LikeLocal[];
 }

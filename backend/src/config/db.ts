@@ -7,6 +7,8 @@ import { Cerveza } from "../models/Cerveza";
 import { Degustacion } from "../models/Degustacion";
 import { Local } from "../models/Local";
 import { UsuarioGalardon } from "../models/UsuarioGalardon";
+import { ComentarioDegustacion } from "../models/ComentarioDegustacion";
+import { LikeLocal } from "../models/LikeLocal";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -16,5 +18,5 @@ export const AppDataSource = new DataSource({
   },
   synchronize: true, // esto borra/cambia tablas si los modelos cambian
   logging: false,
-  entities: [Usuario, SolicitudAmistad, Cerveza, Degustacion, Local, UsuarioGalardon],
+  entities: [Usuario, SolicitudAmistad, Cerveza, Degustacion, Local, UsuarioGalardon, ComentarioDegustacion,LikeLocal],
 });

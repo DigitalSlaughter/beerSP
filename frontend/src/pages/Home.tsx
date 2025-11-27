@@ -253,7 +253,7 @@ const Home: React.FC = () => {
 
       <Footer />
 
-      {/* 🔥 MODAL DE IMAGEN AMPLIADA */}
+      {/*MODAL DE IMAGEN AMPLIADA */}
       {imagenAmpliada && (
         <div
           className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"

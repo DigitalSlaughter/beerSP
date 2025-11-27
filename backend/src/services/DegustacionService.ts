@@ -22,9 +22,7 @@ export class DegustacionService {
       cerveza,
       local,
       puntuacion: data.puntuacion,
-      comentario: data.comentario,
       pais_degustacion: data.pais_degustacion,
-      me_gusta: data.me_gusta
     });
 
     return await DegustacionRepository.save(nueva);

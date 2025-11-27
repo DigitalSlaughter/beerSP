@@ -7,6 +7,8 @@ import Profile from "../pages/Profile";
 import Degustaciones from "../pages/Degustaciones";
 import ProtectedRoute from "../components/ProtectedRoute";
 import VerifyEmail from "../pages/VerifyEmail";
+import Galardones from "../pages/Galardones";
+
 
 const AppRoutes: React.FC = () => {
   const token = localStorage.getItem("token");
@@ -40,6 +42,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Degustaciones />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/galardones"
+        element={
+          <ProtectedRoute>
+            <Galardones />
           </ProtectedRoute>
         }
       />

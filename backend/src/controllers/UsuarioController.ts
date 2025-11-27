@@ -9,41 +9,41 @@ const usuarioService = new UsuarioService();
 
 export class UsuarioController {
   async crearUsuario(req: Request, res: Response) {
-  try {
-    // 1. Tomamos los campos del body
-    const usuarioData = { ...req.body };
+    try {
+      // 1. Tomamos los campos del body
+      const usuarioData = { ...req.body };
 
-    // 2. Si hay foto subida por multer
-    if (req.file) {
-      usuarioData.foto = (req.file as any).key; // Guardamos el key, no la URL
+      // 2. Si hay foto subida por multer
+      if (req.file) {
+        usuarioData.foto = (req.file as any).key; // Guardamos el key, no la URL
+      }
+
+      console.log("[UsuarioController] Petición para crear usuario:", usuarioData);
+
+      // 3. Crear usuario
+      const usuario = await usuarioService.crearUsuario(usuarioData);
+
+      // 4. Asignar galardón de creación de cuenta
+      await galardonService.asignarGalardonEvento(usuario, "crear_cuenta");
+
+      // 5. Recargar usuario con galardones para devolverlo completo
+      const usuarioConGalardones = await UsuarioRepository.findOne({
+        where: { id: usuario.id },
+        relations: ["galardonesAsignados"]
+      });
+
+      console.log("[UsuarioController] Usuario creado correctamente:", usuario.id);
+
+      res.status(201).json(usuarioConGalardones);
+    } catch (error: any) {
+      console.error("[UsuarioController] Error creando usuario:", error.message);
+
+      res.status(400).json({
+        mensaje: "Error al crear usuario",
+        error: error.message
+      });
     }
-
-    console.log("[UsuarioController] Petición para crear usuario:", usuarioData);
-
-    // 3. Crear usuario
-    const usuario = await usuarioService.crearUsuario(usuarioData);
-
-    // 4. Asignar galardón de creación de cuenta
-    await galardonService.asignarGalardonEvento(usuario, "crear_cuenta");
-
-    // 5. Recargar usuario con galardones para devolverlo completo
-    const usuarioConGalardones = await UsuarioRepository.findOne({
-      where: { id: usuario.id },
-      relations: ["galardonesAsignados"]
-    });
-
-    console.log("[UsuarioController] Usuario creado correctamente:", usuario.id);
-
-    res.status(201).json(usuarioConGalardones);
-  } catch (error: any) {
-    console.error("[UsuarioController] Error creando usuario:", error.message);
-
-    res.status(400).json({
-      mensaje: "Error al crear usuario",
-      error: error.message
-    });
   }
-}
 
   async listarDegustaciones(req: Request, res: Response) {
     console.log("[listarDegustaciones] req.params:", req.params);
@@ -74,22 +74,22 @@ export class UsuarioController {
     }
   }
 
-async obtenerUsuario(req: Request, res: Response) {
-  const { id } = req.params;
-  const usuario = await usuarioService.obtenerUsuarioPorId(Number(id));
+  async obtenerUsuario(req: Request, res: Response) {
+    const { id } = req.params;
+    const usuario = await usuarioService.obtenerUsuarioPorId(Number(id));
 
-  if (!usuario) 
-    return res.status(404).json({ mensaje: "Usuario no encontrado" });
+    if (!usuario)
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
 
-  // Si tiene foto almacenada, generamos URL firmada
-  if (usuario.foto) {
-    usuario.foto = await generateSignedUrl(usuario.foto);
+    // Si tiene foto almacenada, generamos URL firmada
+    if (usuario.foto) {
+      usuario.foto = await generateSignedUrl(usuario.foto);
+    }
+
+    res.json(usuario);
   }
 
-  res.json(usuario);
-}
-
-async actualizarUsuario(req: Request, res: Response) {
+  async actualizarUsuario(req: Request, res: Response) {
     const { id } = req.params;
     const datos: any = { ...req.body };
 
@@ -160,4 +160,77 @@ async actualizarUsuario(req: Request, res: Response) {
       });
     }
   }
+  async obtenerGalardones(req: Request, res: Response) {
+    const usuarioId = Number(req.params.id);
+
+    if (isNaN(usuarioId)) {
+      return res.status(400).json({ mensaje: "ID de usuario inválido" });
+    }
+
+    try {
+      const usuario = await UsuarioRepository.findOne({
+        where: { id: usuarioId },
+        relations: {
+          degustaciones: {
+            local: true,
+            cerveza: true
+          },
+          comentariosDegustacion: true,
+          galardonesAsignados: true
+        }
+      });
+
+      if (!usuario) {
+        return res.status(404).json({ mensaje: "Usuario no encontrado" });
+      }
+
+      // ← NUEVO: evitar undefined
+      const asignados = usuario.galardonesAsignados ?? [];
+
+      // ← progreso real basado en relaciones cargadas
+      const progresoReal = await galardonService.obtenerProgresoActual(usuario);
+
+      const catalogo = galardonService.getCatalogo();
+
+      const respuesta = catalogo.map((g) => {
+        const asignado = asignados.find((ag) => ag.galardonId === g.id);
+
+        const cantidadReal = progresoReal[g.id] ?? 0;
+
+        // progreso hacia siguiente nivel
+        const progreso = galardonService.calcularProgreso(cantidadReal, g);
+
+        return {
+          id: g.id,
+          nombre: g.nombre,
+          descripcion: g.descripcion,
+          niveles: g.niveles,
+
+          // Nivel guardado en BD
+          nivelAlmacenado: asignado ? asignado.nivel : 0,
+
+          // Nivel calculado con su progreso real
+          nivelCalculado: progreso.nivelActual,
+
+          // Fecha de obtención del nivel guardado
+          fecha_obtencion: asignado ? asignado.fecha_obtencion : null,
+
+          // Datos del progreso
+          ...progreso
+        };
+      });
+
+      res.json(respuesta);
+
+    } catch (error: any) {
+      console.error("[obtenerGalardones] Error:", error);
+      res.status(500).json({
+        mensaje: "Error al obtener galardones",
+        error: error.message
+      });
+    }
+  }
+
+
+
 }

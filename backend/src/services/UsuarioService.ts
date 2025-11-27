@@ -43,7 +43,7 @@ async listarDegustacionesUsuario(usuarioId: number) {
   async obtenerUsuarioPorId(id: number): Promise<Usuario | null> {
     return await UsuarioRepository.findOne({
       where: { id },
-      relations: ["degustaciones"]
+      relations: ["degustaciones","galardonesAsignados"]
     });
   }
 

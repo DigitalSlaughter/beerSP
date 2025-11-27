@@ -11,6 +11,9 @@ router.post("/", upload.single("foto"), usuarioController.crearUsuario);
 // Listar degustaciones de un usuario
 router.get("/:id/degustaciones", usuarioController.listarDegustaciones);
 
+// Obtener galardones de usuario
+router.get("/:id/galardones", usuarioController.obtenerGalardones);
+
 // Obtener usuario por ID
 router.get("/:id", usuarioController.obtenerUsuario);
 

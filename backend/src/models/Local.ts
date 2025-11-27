@@ -1,6 +1,8 @@
 // src/models/Local.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Degustacion } from "./Degustacion";
+import { LikeLocal } from "./LikeLocal";
+
 
 @Entity("locales")
 export class Local {
@@ -16,8 +18,8 @@ export class Local {
   @Column({ nullable: true })
     coordenadas!: string;
 
-  @Column({ default: false })
-    me_gusta!: boolean;
+  @OneToMany(() => LikeLocal, (like) => like.local)
+  likes!: LikeLocal[];
 
   @OneToMany(() => Degustacion, (deg) => deg.local)
     degustaciones!: Degustacion[];

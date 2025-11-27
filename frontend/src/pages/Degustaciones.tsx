@@ -62,6 +62,7 @@ const DegustacionModal: React.FC<Props> = ({ onClose, onSuccess }) => {
   // Estado para la imagen ampliada
   const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
+
   // -------------------------
   // Estados de los diálogos
   // -------------------------
@@ -126,25 +127,23 @@ const DegustacionModal: React.FC<Props> = ({ onClose, onSuccess }) => {
   // -------------------------
   // Búsqueda (filtrado) de cervezas
   // -------------------------
-  useEffect(() => {
-    if (busquedaCerveza.trim().length < 1) {
-      setCervezas([]); // Limpia resultados filtrados
-      return;
-    }
-
-    // Filtra la lista completa en el frontend
-    const filtered = allCervezas.filter((c) =>
-      c.nombre_cerveza.toLowerCase().includes(busquedaCerveza.toLowerCase())
-    );
-    setCervezas(filtered);
-  }, [busquedaCerveza, allCervezas]); // Depende de la búsqueda y de la lista completa
+useEffect(() => {
+  if (busquedaCerveza.trim().length < 1) {
+    setCervezas(allCervezas); // Muestra todo si no hay búsqueda
+    return;
+  }
+  const filtered = allCervezas.filter((c) =>
+    c.nombre_cerveza.toLowerCase().includes(busquedaCerveza.toLowerCase())
+  );
+  setCervezas(filtered);
+}, [busquedaCerveza, allCervezas]);
 
   // -------------------------
   // Búsqueda (filtrado) locales
   // -------------------------
   useEffect(() => {
     if (busquedaLocal.trim().length < 1) {
-      setLocales([]);
+      setLocales(allLocales);
       return;
     }
 
