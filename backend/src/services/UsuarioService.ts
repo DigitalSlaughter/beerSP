@@ -149,4 +149,34 @@ export class UsuarioService {
 
     await this.enviarEmailVerificacion(usuario.correo!, token);
   }
+  // Recuperar contraseña y enviarla por correo
+async enviarContrasenaPorCorreo(correo: string): Promise<void> {
+  const usuario = await UsuarioRepository.findOne({ where: { correo } });
+  if (!usuario) throw new Error("Usuario no encontrado");
+  if (!usuario.password) throw new Error("Usuario no tiene contraseña registrada");
+
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    throw new Error("Credenciales de correo no definidas.");
+  }
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+
+  await transporter.sendMail({
+    from: `"BeerSP" <${process.env.EMAIL_USER}>`,
+    to: correo,
+    subject: "Recuperación de contraseña",
+    html: `
+      <h2>Recuperación de contraseña</h2>
+      <p>Tu contraseña es: <strong>${usuario.password}</strong></p>
+    `
+  });
+}
+
+  
 }

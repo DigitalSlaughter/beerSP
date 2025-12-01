@@ -184,6 +184,26 @@ export class UsuarioController {
       });
     }
   }
+  async recuperarContrasena(req: Request, res: Response) {
+  const { correo } = req.body;
+
+  if (!correo) {
+    return res.status(400).json({ mensaje: "Correo requerido" });
+  }
+
+  try {
+    await usuarioService.enviarContrasenaPorCorreo(correo);
+
+    res.json({
+      mensaje: "La contraseña ha sido enviada al correo proporcionado"
+    });
+  } catch (error: any) {
+    console.error("[recuperarContrasena]", error.message);
+    res.status(404).json({ mensaje: error.message });
+  }
+}
+
+  
   async obtenerGalardones(req: Request, res: Response) {
     const usuarioId = Number(req.params.idUsuario);
 

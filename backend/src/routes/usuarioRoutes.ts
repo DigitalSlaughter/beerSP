@@ -25,6 +25,7 @@ router.get("/:idUsuario/galardones", usuarioController.obtenerGalardones);
 // Verificación de cuenta
 router.get("/verification/:token", usuarioController.verificarUsuario);
 router.post("/verification/resend", usuarioController.reenviarVerificacion);
+router.post("/password/recovery", usuarioController.recuperarContrasena);
 
 // ---------------------------
 // SUB-RECURSOS: SOLICITUDES
