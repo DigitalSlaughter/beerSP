@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import axios from "axios";
+import MainLayout from "../components/MainLayout";
 
 interface Galardon {
   id: string;
@@ -14,8 +13,6 @@ interface Galardon {
   faltante: number;
   siguienteRequisito: number | null;
 }
-
-
 
 const Galardones: React.FC = () => {
   const [galardones, setGalardones] = useState<Galardon[]>([]);
@@ -58,13 +55,10 @@ const Galardones: React.FC = () => {
 
   const galardonesObtenidos = galardones.filter(g => g.completado);
   const galardonesPendientes = galardones.filter(g => !g.completado);
-
   const mostrarTodos = verTodos ? galardones : galardones.slice(0, 3);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-
+    <MainLayout>
       <main className="flex-1 p-6 max-w-4xl mx-auto space-y-6">
         <h1 className="text-3xl font-bold mb-4">Mis Galardones</h1>
 
@@ -107,9 +101,7 @@ const Galardones: React.FC = () => {
                       onClick={() => setGalardonSeleccionado(g)}
                       className="bg-white rounded shadow p-4 flex flex-col items-center cursor-pointer opacity-50 hover:opacity-75 transition"
                     >
-                      <div className="w-16 h-16 bg-yellow-300 rounded-full flex items-center justify-center text-xl font-bold">
-                        {/* Nivel pendiente no se muestra */}
-                      </div>
+                      <div className="w-16 h-16 bg-yellow-300 rounded-full flex items-center justify-center text-xl font-bold" />
                       <p className="mt-2 font-semibold text-center">{g.nombre}</p>
                       {g.siguienteRequisito !== null && (
                         <p className="text-xs text-gray-400 mt-1 text-center">
@@ -136,61 +128,50 @@ const Galardones: React.FC = () => {
         ) : (
           <p>No tienes galardones aún.</p>
         )}
-      </main>
 
-      <Footer />
-
-      {galardonSeleccionado && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-          onClick={() => setGalardonSeleccionado(null)}
-        >
+        {/* Modal galardón */}
+        {galardonSeleccionado && (
           <div
-            className="bg-white rounded shadow p-6 max-w-sm w-full animate-fadeIn"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            onClick={() => setGalardonSeleccionado(null)}
           >
-            <h2 className="text-xl font-bold mb-2">{galardonSeleccionado.nombre}</h2>
-
-            <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 bg-yellow-300 rounded-full flex items-center justify-center text-3xl font-bold">
-                {galardonSeleccionado.nivelCalculado}
-              </div>
-            </div>
-
-            <p className="text-gray-700 mb-2">{galardonSeleccionado.descripcion}</p>
-
-            {/* Fecha de obtención si existe */}
-            {galardonSeleccionado.fecha && (
-              <p className="text-gray-700">
-                <strong>Fecha obtención:</strong> {galardonSeleccionado.fecha}
-              </p>
-            )}
-
-            {/* Mostrar nivel actual */}
-            <p className="text-gray-700">
-              <strong>Nivel actual:</strong> {galardonSeleccionado.nivelCalculado}
-            </p>
-
-            {/* Mostrar progreso hacia siguiente nivel si existe */}
-            {galardonSeleccionado.siguienteRequisito !== null && (
-              <p className="text-gray-700 mt-2">
-                <strong>Progreso al siguiente nivel:</strong><br />
-                Faltan <strong>{galardonSeleccionado.faltante}</strong> para llegar al requisito de&nbsp;
-                <strong>{galardonSeleccionado.siguienteRequisito}</strong>.
-              </p>
-            )}
-
-            <button
-              onClick={() => setGalardonSeleccionado(null)}
-              className="mt-4 w-full py-2 bg-gray-200 rounded hover:bg-gray-300"
+            <div
+              className="bg-white rounded shadow p-6 max-w-sm w-full animate-fadeIn"
+              onClick={(e) => e.stopPropagation()}
             >
-              Cerrar
-            </button>
+              <h2 className="text-xl font-bold mb-2">{galardonSeleccionado.nombre}</h2>
+              <div className="flex justify-center mb-4">
+                <div className="w-20 h-20 bg-yellow-300 rounded-full flex items-center justify-center text-3xl font-bold">
+                  {galardonSeleccionado.nivelCalculado}
+                </div>
+              </div>
+              <p className="text-gray-700 mb-2">{galardonSeleccionado.descripcion}</p>
+              {galardonSeleccionado.fecha && (
+                <p className="text-gray-700">
+                  <strong>Fecha obtención:</strong> {galardonSeleccionado.fecha}
+                </p>
+              )}
+              <p className="text-gray-700">
+                <strong>Nivel actual:</strong> {galardonSeleccionado.nivelCalculado}
+              </p>
+              {galardonSeleccionado.siguienteRequisito !== null && (
+                <p className="text-gray-700 mt-2">
+                  <strong>Progreso al siguiente nivel:</strong><br />
+                  Faltan <strong>{galardonSeleccionado.faltante}</strong> para llegar al requisito de&nbsp;
+                  <strong>{galardonSeleccionado.siguienteRequisito}</strong>.
+                </p>
+              )}
+              <button
+                onClick={() => setGalardonSeleccionado(null)}
+                className="mt-4 w-full py-2 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-
-    </div>
+        )}
+      </main>
+    </MainLayout>
   );
 };
 

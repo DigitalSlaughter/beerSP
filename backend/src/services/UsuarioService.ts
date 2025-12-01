@@ -28,7 +28,7 @@ export class UsuarioService {
       throw new Error("No se pudo crear el usuario: " + error.message);
     }
   }
-async listarDegustacionesUsuario(usuarioId: number) {
+  async listarDegustacionesUsuario(usuarioId: number) {
     const usuario = await UsuarioRepository.findOne({ where: { id: usuarioId } });
     if (!usuario) return null;
 
@@ -43,7 +43,7 @@ async listarDegustacionesUsuario(usuarioId: number) {
   async obtenerUsuarioPorId(id: number): Promise<Usuario | null> {
     return await UsuarioRepository.findOne({
       where: { id },
-      relations: ["degustaciones","galardonesAsignados"]
+      relations: ["degustaciones", "galardonesAsignados"]
     });
   }
 
@@ -85,9 +85,10 @@ async listarDegustacionesUsuario(usuarioId: number) {
 
   async listarUsuarios(): Promise<Usuario[]> {
     return await UsuarioRepository.find({
-      relations: ["galardones", "degustaciones"]
+      relations: ["galardonesAsignados", "degustaciones"]
     });
   }
+
 
   // -----------------------------
   // VERIFICACIÓN DE CUENTA

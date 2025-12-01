@@ -50,7 +50,7 @@ export class UsuarioController {
     console.log("[listarDegustaciones] req.url:", req.url);
     console.log("[listarDegustaciones] req.method:", req.method);
 
-    const usuarioId = Number(req.params.id); // Debe coincidir con :id en la ruta
+    const usuarioId = Number(req.params.idUsuario);
     console.log("[listarDegustaciones] usuarioId convertido a Number:", usuarioId);
 
     if (isNaN(usuarioId)) {
@@ -75,8 +75,12 @@ export class UsuarioController {
   }
 
   async obtenerUsuario(req: Request, res: Response) {
-    const { id } = req.params;
-    const usuario = await usuarioService.obtenerUsuarioPorId(Number(id));
+    const usuarioId = Number(req.params.idUsuario);
+    if (isNaN(usuarioId)) {
+      console.warn("[listarDegustaciones] ID de usuario inválido");
+      return res.status(400).json({ mensaje: "ID de usuario inválido" });
+    }
+    const usuario = await usuarioService.obtenerUsuarioPorId(usuarioId);
 
     if (!usuario)
       return res.status(404).json({ mensaje: "Usuario no encontrado" });
@@ -90,7 +94,11 @@ export class UsuarioController {
   }
 
   async actualizarUsuario(req: Request, res: Response) {
-    const { id } = req.params;
+    const usuarioId = Number(req.params.idUsuario);
+    if (isNaN(usuarioId)) {
+      console.warn("[listarDegustaciones] ID de usuario inválido");
+      return res.status(400).json({ mensaje: "ID de usuario inválido" });
+    } 
     const datos: any = { ...req.body };
 
     // Nueva imagen subida → guardar la nueva key
@@ -98,7 +106,7 @@ export class UsuarioController {
       datos.foto = (req.file as any).key;
     }
 
-    const usuario = await usuarioService.actualizarUsuario(Number(id), datos);
+    const usuario = await usuarioService.actualizarUsuario(usuarioId, datos);
     if (!usuario)
       return res.status(404).json({ error: "Usuario no encontrado" });
 
@@ -112,18 +120,34 @@ export class UsuarioController {
 
 
   async eliminarUsuario(req: Request, res: Response) {
-    const { id } = req.params;
-    const eliminado = await usuarioService.eliminarUsuario(Number(id));
+    const usuarioId = Number(req.params.idUsuario);
+    if (isNaN(usuarioId)) {
+      console.warn("[listarDegustaciones] ID de usuario inválido");
+      return res.status(400).json({ mensaje: "ID de usuario inválido" });
+    }
+    const eliminado = await usuarioService.eliminarUsuario(usuarioId);
 
     if (!eliminado) return res.status(404).json({ mensaje: "Usuario no encontrado" });
 
     res.json({ mensaje: "Usuario eliminado" });
   }
 
-  async listarUsuarios(req: Request, res: Response) {
-    const usuarios = await usuarioService.listarUsuarios();
-    res.json(usuarios);
-  }
+ async listarUsuarios(req: Request, res: Response) {
+  const usuarios = await usuarioService.listarUsuarios();
+
+  // Generar signed URL si tienen foto
+  const usuariosConFoto = await Promise.all(
+    usuarios.map(async (u) => {
+      if (u.foto) {
+        u.foto = await generateSignedUrl(u.foto);
+      }
+      return u;
+    })
+  );
+
+  res.json(usuariosConFoto);
+}
+
 
   // -----------------------------
   // VERIFICACIÓN DE CUENTA
@@ -161,7 +185,7 @@ export class UsuarioController {
     }
   }
   async obtenerGalardones(req: Request, res: Response) {
-    const usuarioId = Number(req.params.id);
+    const usuarioId = Number(req.params.idUsuario);
 
     if (isNaN(usuarioId)) {
       return res.status(400).json({ mensaje: "ID de usuario inválido" });

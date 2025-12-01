@@ -8,6 +8,7 @@ import Degustaciones from "../pages/Degustaciones";
 import ProtectedRoute from "../components/ProtectedRoute";
 import VerifyEmail from "../pages/VerifyEmail";
 import Galardones from "../pages/Galardones";
+import Amigos from "../pages/Amigos";
 
 
 const AppRoutes: React.FC = () => {
@@ -42,6 +43,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Degustaciones />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/amigos"
+        element={
+          <ProtectedRoute>
+            <Amigos />
           </ProtectedRoute>
         }
       />

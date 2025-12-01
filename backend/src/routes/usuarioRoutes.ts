@@ -1,33 +1,44 @@
 import { Router } from "express";
 import { UsuarioController } from "../controllers/UsuarioController";
-import { upload } from "../config/r2Multer"; // Multer configurado para R2
+import { SolicitudAmistadController } from "../controllers/SolicitudAmistadController";
+import { upload } from "../config/r2Multer";
 
 const router = Router();
 const usuarioController = new UsuarioController();
+const solicitudController = new SolicitudAmistadController();
 
-// Ruta de creación de usuario con foto opcional
-router.post("/", upload.single("foto"), usuarioController.crearUsuario);
+// ---------------------------
+// RUTAS DE USUARIOS
+// ---------------------------
 
-// Listar degustaciones de un usuario
-router.get("/:id/degustaciones", usuarioController.listarDegustaciones);
-
-// Obtener galardones de usuario
-router.get("/:id/galardones", usuarioController.obtenerGalardones);
-
-// Obtener usuario por ID
-router.get("/:id", usuarioController.obtenerUsuario);
-
-// Actualizar usuario con foto opcional
-router.put("/:id", upload.single("foto"), usuarioController.actualizarUsuario);
-
-// Eliminar usuario
-router.delete("/:id", usuarioController.eliminarUsuario);
-
-// Listar todos los usuarios
+// CRUD de usuarios
 router.get("/", usuarioController.listarUsuarios);
+router.post("/", upload.single("foto"), usuarioController.crearUsuario);
+router.get("/:idUsuario", usuarioController.obtenerUsuario);
+router.put("/:idUsuario", upload.single("foto"), usuarioController.actualizarUsuario);
+router.delete("/:idUsuario", usuarioController.eliminarUsuario);
 
-// Rutas de verificación de cuenta
-router.get("/verify/:token", usuarioController.verificarUsuario);
-router.post("/verify/resend", usuarioController.reenviarVerificacion);
+// Sub-recursos relacionados con usuario
+router.get("/:idUsuario/degustaciones", usuarioController.listarDegustaciones);
+router.get("/:idUsuario/galardones", usuarioController.obtenerGalardones);
+
+// Verificación de cuenta
+router.get("/verification/:token", usuarioController.verificarUsuario);
+router.post("/verification/resend", usuarioController.reenviarVerificacion);
+
+// ---------------------------
+// SUB-RECURSOS: SOLICITUDES
+// ---------------------------
+
+// Listar solicitudes de un usuario (puedes filtrar por estado usando query param)
+router.get("/:idUsuario/solicitudes", solicitudController.listar);
+
+// Crear solicitud desde este usuario hacia otro
+router.post("/:idUsuario/solicitudes", solicitudController.crear);
+
+// Obtener, actualizar o eliminar solicitud específica
+router.get("/:idUsuario/solicitudes/:idSolicitud", solicitudController.obtener);
+router.put("/:idUsuario/solicitudes/:idSolicitud", solicitudController.actualizar);
+router.delete("/:idUsuario/solicitudes/:idSolicitud", solicitudController.eliminar);
 
 export default router;

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, FormEvent } from "react";
 import axios from "axios";
+import MainLayout from "../components/MainLayout";
 
 interface Props {
   onClose?: () => void;
@@ -28,7 +29,7 @@ interface Local {
   me_gusta?: boolean;
 }
 
-const DegustacionModal: React.FC<Props> = ({ onClose, onSuccess }) => {
+const DegustacionModal: React.FC<Props> = ({ onClose = () => {}, onSuccess }) => {
   // -------------------------
   // Estados principales
   // -------------------------
@@ -127,16 +128,16 @@ const DegustacionModal: React.FC<Props> = ({ onClose, onSuccess }) => {
   // -------------------------
   // Búsqueda (filtrado) de cervezas
   // -------------------------
-useEffect(() => {
-  if (busquedaCerveza.trim().length < 1) {
-    setCervezas(allCervezas); // Muestra todo si no hay búsqueda
-    return;
-  }
-  const filtered = allCervezas.filter((c) =>
-    c.nombre_cerveza.toLowerCase().includes(busquedaCerveza.toLowerCase())
-  );
-  setCervezas(filtered);
-}, [busquedaCerveza, allCervezas]);
+  useEffect(() => {
+    if (busquedaCerveza.trim().length < 1) {
+      setCervezas(allCervezas); // Muestra todo si no hay búsqueda
+      return;
+    }
+    const filtered = allCervezas.filter((c) =>
+      c.nombre_cerveza.toLowerCase().includes(busquedaCerveza.toLowerCase())
+    );
+    setCervezas(filtered);
+  }, [busquedaCerveza, allCervezas]);
 
   // -------------------------
   // Búsqueda (filtrado) locales
@@ -271,9 +272,6 @@ useEffect(() => {
 
       setMensaje("Degustación creada correctamente.");
       if (onSuccess) onSuccess();
-      
-      // Opcional: cerrar el modal tras éxito
-      // if (onClose) onClose();
 
     } catch (error: any) {
       console.error("Error al crear degustación:", error);
@@ -285,13 +283,13 @@ useEffect(() => {
 
   const placeholderImg = "https://placehold.co/64x64/EBF4FF/7F9CF5?text=Cerveza";
 
-  return (
+  return (<MainLayout>
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start pt-10 z-50 overflow-y-auto">
       <div className="bg-white w-full max-w-2xl rounded shadow p-4 relative mb-10">
         <h2 className="text-xl font-bold mb-4">Registrar degustación</h2>
 
         {mensaje && (
-           <p className={`mb-3 p-2 rounded ${mensaje.includes("Error") ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+          <p className={`mb-3 p-2 rounded ${mensaje.includes("Error") ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
             {mensaje}
           </p>
         )}
@@ -445,12 +443,12 @@ useEffect(() => {
             )}
 
             {/* --- Local Seleccionado --- */}
-             {localSeleccionado && (
+            {localSeleccionado && (
               <div className="mt-2 p-3 border rounded bg-gray-50 flex items-center justify-between">
                 <p className="font-bold text-gray-800">
                   {localSeleccionado.nombre_local}
                 </p>
-                 <button
+                <button
                   type="button"
                   onClick={() => setLocalSeleccionado(null)}
                   className="text-red-500 hover:text-red-700 font-semibold text-xl"
@@ -458,7 +456,7 @@ useEffect(() => {
                   &times;
                 </button>
               </div>
-             )}
+            )}
 
           </div>
 
@@ -496,23 +494,35 @@ useEffect(() => {
             />
             ¿Te gustó?
           </label>
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-500 disabled:bg-gray-400"
-          >
-            {loading ? "Guardando..." : "Guardar degustación"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-500 disabled:bg-gray-400"
+            >
+              {loading ? "Guardando..." : "Guardar degustación"}
+            </button>
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+              >
+                Cerrar
+              </button>
+            )}
+          </div>
+
         </form>
 
         {/* Botón de cerrar principal */}
         {onClose && (
-           <button
-             onClick={onClose}
-             className="absolute top-2 right-3 text-gray-600 hover:text-gray-900 text-2xl"
-           >
-             &times;
-           </button>
+          <button
+            onClick={onClose}
+            className="absolute top-2 right-3 text-gray-600 hover:text-gray-900 text-2xl"
+          >
+            &times;
+          </button>
         )}
 
         {/* MODAL CREAR CERVEZA */}
@@ -532,10 +542,10 @@ useEffect(() => {
                 placeholder="Nombre de la cerveza"
                 value={nuevaCerveza.nombre_cerveza}
                 onChange={(e) =>
-                    setNuevaCerveza({ ...nuevaCerveza, nombre_cerveza: e.target.value })
+                  setNuevaCerveza({ ...nuevaCerveza, nombre_cerveza: e.target.value })
                 }
                 className="border p-2 rounded"
-               />
+              />
               {/* ESTILO */}
               <select
                 value={nuevaCerveza.estilo}
@@ -761,6 +771,7 @@ useEffect(() => {
 
       </div>
     </div>
+  </MainLayout>
   );
 };
 

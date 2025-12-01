@@ -1,8 +1,7 @@
 // src/pages/Profile.tsx
 import React, { useEffect, useState, ChangeEvent } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import axios from "axios";
+import MainLayout from "../components/MainLayout";
 
 interface Usuario {
   id: number;
@@ -98,7 +97,6 @@ const Profile: React.FC = () => {
         formData.append(campo, valor !== undefined && valor !== null ? String(valor) : "");
       });
 
-      // Solo enviar foto si se seleccionó un archivo nuevo
       if (foto) {
         formData.append("foto", foto);
       }
@@ -128,14 +126,35 @@ const Profile: React.FC = () => {
     : undefined;
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
+    <MainLayout>
       <main className="flex-1 p-6 max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Mi Perfil</h1>
+        <h1 className="text-2xl font-bold mb-6">Mi Perfil</h1>
         {error && <p className="text-red-500">{error}</p>}
         {info && <p className="text-green-500">{info}</p>}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          {/* Imagen de perfil arriba */}
+          <div className="flex items-center gap-4 mb-4">
+            {fotoUrl && (
+              <img
+                src={fotoUrl}
+                alt="Perfil"
+                className="w-32 h-32 object-cover rounded-full cursor-pointer hover:opacity-80 transition"
+                onClick={() => setFotoModal(fotoUrl)}
+              />
+            )}
+            <div className="flex flex-col gap-2">
+              <label className="font-medium">Cambiar foto de perfil</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFotoChange}
+                className="border p-2 rounded"
+              />
+            </div>
+          </div>
+
+          {/* Resto del formulario */}
           <input
             type="text"
             name="nombre_usuario"
@@ -155,7 +174,11 @@ const Profile: React.FC = () => {
               onChange={handleChange}
               className="border p-2 rounded flex-1"
             />
-            <button type="button" onClick={() => handleClear("nombre")} className="px-2 py-1 bg-gray-300 rounded">
+            <button
+              type="button"
+              onClick={() => handleClear("nombre")}
+              className="px-2 py-1 bg-gray-300 rounded"
+            >
               Borrar
             </button>
           </div>
@@ -169,7 +192,11 @@ const Profile: React.FC = () => {
               onChange={handleChange}
               className="border p-2 rounded flex-1"
             />
-            <button type="button" onClick={() => handleClear("apellidos")} className="px-2 py-1 bg-gray-300 rounded">
+            <button
+              type="button"
+              onClick={() => handleClear("apellidos")}
+              className="px-2 py-1 bg-gray-300 rounded"
+            >
               Borrar
             </button>
           </div>
@@ -193,7 +220,11 @@ const Profile: React.FC = () => {
               onChange={handleChange}
               className="border p-2 rounded flex-1"
             />
-            <button type="button" onClick={() => handleClear("ubicacion")} className="px-2 py-1 bg-gray-300 rounded">
+            <button
+              type="button"
+              onClick={() => handleClear("ubicacion")}
+              className="px-2 py-1 bg-gray-300 rounded"
+            >
               Borrar
             </button>
           </div>
@@ -207,7 +238,11 @@ const Profile: React.FC = () => {
               onChange={handleChange}
               className="border p-2 rounded flex-1"
             />
-            <button type="button" onClick={() => handleClear("genero")} className="px-2 py-1 bg-gray-300 rounded">
+            <button
+              type="button"
+              onClick={() => handleClear("genero")}
+              className="px-2 py-1 bg-gray-300 rounded"
+            >
               Borrar
             </button>
           </div>
@@ -221,7 +256,11 @@ const Profile: React.FC = () => {
               onChange={handleChange}
               className="border p-2 rounded flex-1"
             />
-            <button type="button" onClick={() => handleClear("pais")} className="px-2 py-1 bg-gray-300 rounded">
+            <button
+              type="button"
+              onClick={() => handleClear("pais")}
+              className="px-2 py-1 bg-gray-300 rounded"
+            >
               Borrar
             </button>
           </div>
@@ -234,7 +273,11 @@ const Profile: React.FC = () => {
               onChange={handleChange}
               className="border p-2 rounded flex-1"
             />
-            <button type="button" onClick={() => handleClear("fecha_nacimiento")} className="px-2 py-1 bg-gray-300 rounded">
+            <button
+              type="button"
+              onClick={() => handleClear("fecha_nacimiento")}
+              className="px-2 py-1 bg-gray-300 rounded"
+            >
               Borrar
             </button>
           </div>
@@ -247,41 +290,13 @@ const Profile: React.FC = () => {
               onChange={handleChange}
               className="border p-2 rounded flex-1"
             />
-            <button type="button" onClick={() => handleClear("texto_introduccion")} className="px-2 py-1 bg-gray-300 rounded">
+            <button
+              type="button"
+              onClick={() => handleClear("texto_introduccion")}
+              className="px-2 py-1 bg-gray-300 rounded"
+            >
               Borrar
             </button>
-          </div>
-
-          <div>
-            <label className="block mb-1">Foto de perfil</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFotoChange}
-              className="border p-2 rounded"
-            />
-
-            {fotoUrl && (
-              <img
-                src={fotoUrl}
-                alt="Perfil"
-                className="mt-2 w-32 h-32 object-cover rounded-full cursor-pointer hover:opacity-80 transition"
-                onClick={() => setFotoModal(fotoUrl)}
-              />
-            )}
-
-            {fotoModal && (
-              <div
-                className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-                onClick={() => setFotoModal(null)}
-              >
-                <img
-                  src={fotoModal}
-                  alt="Perfil ampliada"
-                  className="max-w-[90%] max-h-[90%] rounded"
-                />
-              </div>
-            )}
           </div>
 
           <button
@@ -291,9 +306,22 @@ const Profile: React.FC = () => {
             Guardar cambios
           </button>
         </form>
+
+        {/* Modal de imagen */}
+        {fotoModal && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            onClick={() => setFotoModal(null)}
+          >
+            <img
+              src={fotoModal}
+              alt="Perfil ampliada"
+              className="max-w-[90%] max-h-[90%] rounded"
+            />
+          </div>
+        )}
       </main>
-      <Footer />
-    </div>
+    </MainLayout>
   );
 };
 

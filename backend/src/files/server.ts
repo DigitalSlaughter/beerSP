@@ -6,7 +6,6 @@ import { AppDataSource } from "../config/db";
 import usuarioRoutes from "../routes/usuarioRoutes";
 import cervezaRoutes from "../routes/cervezaRoutes";
 import degustacionRoutes from "../routes/degustacionRoutes";
-import solicitudRoutes from "../routes/solicitudAmistadRoutes";
 import localRoutes from "../routes/localRoutes";
 import authRoutes from "../routes/authRoutes";
 
@@ -26,7 +25,6 @@ app.use(express.json());
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/cervezas", cervezaRoutes);
 app.use("/api/degustaciones", degustacionRoutes);
-app.use("/api/solicitudes", solicitudRoutes);
 app.use("/api/locales", localRoutes);
 app.use("/api/auth", authRoutes);
 
