@@ -51,7 +51,6 @@ const DegustacionModal: React.FC<Props> = ({ onClose = () => {}, onSuccess }) =>
   );
 
   const [puntuacion, setPuntuacion] = useState<number | null>(null);
-  const [comentario, setComentario] = useState("");
   const [paisDegustacion, setPaisDegustacion] = useState("");
   const [meGusta, setMeGusta] = useState(false);
 
@@ -263,7 +262,6 @@ const DegustacionModal: React.FC<Props> = ({ onClose = () => {}, onSuccess }) =>
           cervezaId: cervezaSeleccionada.id,
           localId: localSeleccionado.id,
           puntuacion: puntuacion ?? null,
-          comentario: comentario || "",
           pais_degustacion: paisDegustacion || "",
           me_gusta: meGusta,
         },
@@ -471,12 +469,6 @@ const DegustacionModal: React.FC<Props> = ({ onClose = () => {}, onSuccess }) =>
               setPuntuacion(e.target.value === "" ? null : Number(e.target.value))
             }
             placeholder="Puntuación (0-5)"
-            className="border p-2 rounded"
-          />
-          <textarea
-            placeholder="Comentario"
-            value={comentario}
-            onChange={(e) => setComentario(e.target.value)}
             className="border p-2 rounded"
           />
           <input

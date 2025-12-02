@@ -2,63 +2,65 @@ import { Request, Response } from "express";
 import { DegustacionService } from "../services/DegustacionService";
 import { GalardonService } from "../services/GalardonService";
 import { UsuarioRepository } from "../repositories/UsuarioRepository";
+import { ComentarioDegustacionService } from "../services/ComentarioDegustacionService";
 
+const comentarioService = new ComentarioDegustacionService();
 const service = new DegustacionService();
 const galardonService = new GalardonService();
 
 export class DegustacionController {
   crear = async (req: Request, res: Response) => {
-  console.log("[CREAR] Body recibido:", req.body);
-  try {
-    // 1. Crear la degustación
-    const degustacion = await service.crear(req.body);
-    console.log("[CREAR] Degustación creada:", degustacion);
+    console.log("[CREAR] Body recibido:", req.body);
+    try {
+      // 1. Crear la degustación
+      const degustacion = await service.crear(req.body);
+      console.log("[CREAR] Degustación creada:", degustacion);
 
-    // 2. Obtener usuario con degustaciones, cervezas y galardones asignados
-    const usuario = await UsuarioRepository.findOne({
-      where: { id: degustacion.usuario.id },
-      relations: ["degustaciones", "degustaciones.cerveza", "galardonesAsignados"]
-    });
+      // 2. Obtener usuario con degustaciones, cervezas y galardones asignados
+      const usuario = await UsuarioRepository.findOne({
+        where: { id: degustacion.usuario.id },
+        relations: ["degustaciones", "degustaciones.cerveza", "galardonesAsignados"]
+      });
 
-    if (!usuario) {
-      console.warn("[CREAR] Usuario no encontrado para galardón");
-      return res.status(404).json({ mensaje: "Usuario no encontrado para galardón" });
+      if (!usuario) {
+        console.warn("[CREAR] Usuario no encontrado para galardón");
+        return res.status(404).json({ mensaje: "Usuario no encontrado para galardón" });
+      }
+
+      // 3. Contar degustaciones únicas por cerveza
+      const cervezasUnicas = new Set(usuario.degustaciones.map(d => d.cerveza.id));
+      const cantidadCervezas = cervezasUnicas.size;
+
+      // 4. Contar países únicos de degustación (para otro galardón)
+      const paisesUnicos = new Set(usuario.degustaciones.map(d => d.pais_degustacion));
+      const cantidadPaises = paisesUnicos.size;
+
+      // 5. Asignar o actualizar galardón de primera degustación
+      const galardonPrimera = galardonService.obtenerGalardonDef("primera_degustacion");
+      if (galardonPrimera) {
+        const nivel = galardonService.calcularNivel(usuario.degustaciones.length, galardonPrimera);
+        await galardonService.asignarGalardon(usuario, "primera_degustacion", nivel);
+      }
+
+      // 6. Asignar o actualizar galardón "cervezas_distintas" según cervezas únicas
+      const galardonCervezas = galardonService.obtenerGalardonDef("cervezas_distintas");
+      if (galardonCervezas) {
+        const nivel = galardonService.calcularNivel(cantidadCervezas, galardonCervezas);
+        await galardonService.asignarGalardon(usuario, "cervezas_distintas", nivel);
+      }
+
+      // 7. Asignar o actualizar galardón "paises_distintos" según países únicos
+      const galardonPaises = galardonService.obtenerGalardonDef("paises_distintos");
+      if (galardonPaises) {
+        const nivel = galardonService.calcularNivel(cantidadPaises, galardonPaises);
+        await galardonService.asignarGalardon(usuario, "paises_distintos", nivel);
+      }
+      res.status(201).json(degustacion);
+    } catch (error) {
+      console.error("[CREAR] Error al crear degustación:", error);
+      res.status(400).json({ mensaje: "Error al crear degustación", error });
     }
-
-    // 3. Contar degustaciones únicas por cerveza
-    const cervezasUnicas = new Set(usuario.degustaciones.map(d => d.cerveza.id));
-    const cantidadCervezas = cervezasUnicas.size;
-
-    // 4. Contar países únicos de degustación (para otro galardón)
-    const paisesUnicos = new Set(usuario.degustaciones.map(d => d.pais_degustacion));
-    const cantidadPaises = paisesUnicos.size;
-
-    // 5. Asignar o actualizar galardón de primera degustación
-    const galardonPrimera = galardonService.obtenerGalardonDef("primera_degustacion");
-    if (galardonPrimera) {
-      const nivel = galardonService.calcularNivel(usuario.degustaciones.length, galardonPrimera);
-      await galardonService.asignarGalardon(usuario, "primera_degustacion", nivel);
-    }
-
-    // 6. Asignar o actualizar galardón "cervezas_distintas" según cervezas únicas
-    const galardonCervezas = galardonService.obtenerGalardonDef("cervezas_distintas");
-    if (galardonCervezas) {
-      const nivel = galardonService.calcularNivel(cantidadCervezas, galardonCervezas);
-      await galardonService.asignarGalardon(usuario, "cervezas_distintas", nivel);
-    }
-
-    // 7. Asignar o actualizar galardón "paises_distintos" según países únicos
-    const galardonPaises = galardonService.obtenerGalardonDef("paises_distintos");
-    if (galardonPaises) {
-      const nivel = galardonService.calcularNivel(cantidadPaises, galardonPaises);
-      await galardonService.asignarGalardon(usuario, "paises_distintos", nivel);
-    }
-    res.status(201).json(degustacion);
-  } catch (error) {
-    console.error("[CREAR] Error al crear degustación:", error);
-    res.status(400).json({ mensaje: "Error al crear degustación", error });
-  }
-};
+  };
 
 
 
@@ -74,6 +76,17 @@ export class DegustacionController {
       res.status(500).json({ mensaje: "Error al listar degustaciones", error });
     }
   };
+  listarComentarios = async (req: Request, res: Response) => {
+  const degustacionId = Number(req.params.idDegustacion);
+
+  try {
+    const comentarios = await comentarioService.listarPorDegustacion(degustacionId);
+    res.json(comentarios);
+  } catch (error: any) {
+    console.error("[LISTAR_COMENTARIOS] Error:", error);
+    res.status(400).json({ mensaje: error.message });
+  }
+};
 
   obtener = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
@@ -106,6 +119,23 @@ export class DegustacionController {
     } catch (error) {
       console.error("[ACTUALIZAR] Error al actualizar degustación:", error);
       res.status(500).json({ mensaje: "Error al actualizar degustación", error });
+    }
+  };
+  crearComentario = async (req: Request, res: Response) => {
+    const degustacionId = Number(req.params.idDegustacion);
+    const { usuarioId, texto } = req.body;
+
+    try {
+      const comentario = await comentarioService.crear({
+        degustacionId,
+        usuarioId,
+        texto
+      });
+
+      res.status(201).json(comentario);
+    } catch (error: any) {
+      console.error("[CREAR_COMENTARIO] Error:", error);
+      res.status(400).json({ mensaje: error.message });
     }
   };
 
