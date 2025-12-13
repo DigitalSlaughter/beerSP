@@ -1,31 +1,31 @@
 # Details
 
-Date : 2025-12-07 17:30:51
+Date : 2025-12-13 18:00:04
 
-Directory c:\\Users\\sergi\\Documents\\7ºCuatri\\IS2\\Proyecto\\BeerSP\\backend\\src
+Directory c:\\Users\\sergi\\Documents\\7ºCuatri\\IS2\\Proyecto\\BeerSP\\backend
 
-Total : 52 files,  1946 codes, 138 comments, 533 blanks, all 2617 lines
+Total : 53 files,  2134 codes, 144 comments, 550 blanks, all 2828 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Files
 | filename | language | code | comment | blank | total |
 | :--- | :--- | ---: | ---: | ---: | ---: |
+| [backend/jest.config.js](/backend/jest.config.js) | JavaScript | 8 | 1 | 3 | 12 |
 | [backend/src/config/db.ts](/backend/src/config/db.ts) | TypeScript | 20 | 1 | 2 | 23 |
 | [backend/src/config/r2Multer.ts](/backend/src/config/r2Multer.ts) | TypeScript | 14 | 0 | 4 | 18 |
 | [backend/src/config/r2client.ts](/backend/src/config/r2client.ts) | TypeScript | 9 | 0 | 2 | 11 |
 | [backend/src/context/AuthContext.tsx](/backend/src/context/AuthContext.tsx) | TypeScript JSX | 19 | 0 | 6 | 25 |
 | [backend/src/controllers/AuthController.ts](/backend/src/controllers/AuthController.ts) | TypeScript | 16 | 1 | 6 | 23 |
-| [backend/src/controllers/CervezaController.ts](/backend/src/controllers/CervezaController.ts) | TypeScript | 92 | 6 | 14 | 112 |
+| [backend/src/controllers/CervezaController.ts](/backend/src/controllers/CervezaController.ts) | TypeScript | 94 | 6 | 14 | 114 |
 | [backend/src/controllers/DegustacionController.ts](/backend/src/controllers/DegustacionController.ts) | TypeScript | 132 | 7 | 20 | 159 |
 | [backend/src/controllers/LocalController.ts](/backend/src/controllers/LocalController.ts) | TypeScript | 32 | 0 | 7 | 39 |
-| [backend/src/controllers/SolicitudAmistadController.ts](/backend/src/controllers/SolicitudAmistadController.ts) | TypeScript | 80 | 4 | 29 | 113 |
-| [backend/src/controllers/UsuarioController.ts](/backend/src/controllers/UsuarioController.ts) | TypeScript | 198 | 19 | 64 | 281 |
+| [backend/src/controllers/SolicitudAmistadController.ts](/backend/src/controllers/SolicitudAmistadController.ts) | TypeScript | 82 | 4 | 29 | 115 |
+| [backend/src/controllers/UsuarioController.ts](/backend/src/controllers/UsuarioController.ts) | TypeScript | 200 | 19 | 65 | 284 |
 | [backend/src/data/galardones.json](/backend/src/data/galardones.json) | JSON | 68 | 0 | 1 | 69 |
 | [backend/src/files/r2Delete.ts](/backend/src/files/r2Delete.ts) | TypeScript | 15 | 0 | 4 | 19 |
 | [backend/src/files/r2SignedUrl.ts](/backend/src/files/r2SignedUrl.ts) | TypeScript | 14 | 0 | 5 | 19 |
 | [backend/src/files/server.ts](/backend/src/files/server.ts) | TypeScript | 32 | 2 | 7 | 41 |
-| [backend/src/middleware/errorHandler.ts](/backend/src/middleware/errorHandler.ts) | TypeScript | 0 | 1 | 1 | 2 |
 | [backend/src/models/Cerveza.ts](/backend/src/models/Cerveza.ts) | TypeScript | 31 | 1 | 14 | 46 |
 | [backend/src/models/ComentarioDegustacion.ts](/backend/src/models/ComentarioDegustacion.ts) | TypeScript | 26 | 1 | 6 | 33 |
 | [backend/src/models/Degustacion.ts](/backend/src/models/Degustacion.ts) | TypeScript | 33 | 0 | 9 | 42 |
@@ -53,15 +53,16 @@ Total : 52 files,  1946 codes, 138 comments, 533 blanks, all 2617 lines
 | [backend/src/services/LocalService.ts](/backend/src/services/LocalService.ts) | TypeScript | 24 | 0 | 6 | 30 |
 | [backend/src/services/SolicitudAmistadService.ts](/backend/src/services/SolicitudAmistadService.ts) | TypeScript | 63 | 11 | 17 | 91 |
 | [backend/src/services/UsuarioService.ts](/backend/src/services/UsuarioService.ts) | TypeScript | 138 | 8 | 37 | 183 |
-| [backend/src/tests/integration/integracion.test.ts](/backend/src/tests/integration/integracion.test.ts) | TypeScript | 93 | 14 | 17 | 124 |
+| [backend/src/tests/integration/integracion.test.ts](/backend/src/tests/integration/integracion.test.ts) | TypeScript | 232 | 20 | 30 | 282 |
 | [backend/src/tests/unit/auth.controller.test.ts](/backend/src/tests/unit/auth.controller.test.ts) | TypeScript | 35 | 1 | 14 | 50 |
-| [backend/src/tests/unit/cerveza.controller.test.ts](/backend/src/tests/unit/cerveza.controller.test.ts) | TypeScript | 27 | 0 | 12 | 39 |
+| [backend/src/tests/unit/cerveza.controller.test.ts](/backend/src/tests/unit/cerveza.controller.test.ts) | TypeScript | 35 | 0 | 11 | 46 |
 | [backend/src/tests/unit/comentario.controller.test.ts](/backend/src/tests/unit/comentario.controller.test.ts) | TypeScript | 46 | 1 | 14 | 61 |
 | [backend/src/tests/unit/degustacion.controller.test.ts](/backend/src/tests/unit/degustacion.controller.test.ts) | TypeScript | 52 | 1 | 15 | 68 |
 | [backend/src/tests/unit/local.controller.test.ts](/backend/src/tests/unit/local.controller.test.ts) | TypeScript | 42 | 1 | 17 | 60 |
-| [backend/src/tests/unit/solicitud.controller.test.ts](/backend/src/tests/unit/solicitud.controller.test.ts) | TypeScript | 40 | 0 | 12 | 52 |
-| [backend/src/tests/unit/usuario.controller.test.ts](/backend/src/tests/unit/usuario.controller.test.ts) | TypeScript | 27 | 0 | 8 | 35 |
+| [backend/src/tests/unit/solicitud.controller.test.ts](/backend/src/tests/unit/solicitud.controller.test.ts) | TypeScript | 46 | 0 | 13 | 59 |
+| [backend/src/tests/unit/usuario.controller.test.ts](/backend/src/tests/unit/usuario.controller.test.ts) | TypeScript | 33 | 0 | 8 | 41 |
 | [backend/src/tests/utils/expressMocks.ts](/backend/src/tests/utils/expressMocks.ts) | TypeScript | 15 | 1 | 2 | 18 |
 | [backend/src/utils/validators.tsx](/backend/src/utils/validators.tsx) | TypeScript JSX | 10 | 0 | 1 | 11 |
+| [backend/tsconfig.json](/backend/tsconfig.json) | JSON with Comments | 15 | 0 | 1 | 16 |
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)

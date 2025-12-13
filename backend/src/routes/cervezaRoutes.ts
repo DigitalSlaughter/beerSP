@@ -6,10 +6,10 @@ const router = Router();
 const controller = new CervezaController();
 
 // POST con multer para recibir FormData
-router.post("/", upload.single("foto"), controller.crear);
-router.get("/", controller.listar);
-router.get("/:id", controller.obtener);
-router.put("/:id", controller.actualizar);
-router.delete("/:id", controller.eliminar);
+router.post("/", upload.single("foto"), controller.crear.bind(controller));
+router.get("/", controller.listar.bind(controller));
+router.get("/:id", controller.obtener.bind(controller));
+router.put("/:id", controller.actualizar.bind(controller));
+router.delete("/:id", controller.eliminar.bind(controller));
 
 export default router;

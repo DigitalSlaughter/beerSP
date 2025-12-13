@@ -14,7 +14,7 @@ export class SolicitudAmistad {
     usuario2!: Usuario;
 
   @Column({
-        type: "enum",
+        type: "simple-enum",
         enum: ["pendiente", "aceptada", "rechazada", "cancelada"],
         default: "pendiente",
     })

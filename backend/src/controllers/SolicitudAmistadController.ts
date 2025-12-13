@@ -3,9 +3,11 @@ import { Request, Response } from "express";
 import { SolicitudAmistadService } from "../services/SolicitudAmistadService";
 import { generateSignedUrl } from "../files/r2SignedUrl";
 
-const service = new SolicitudAmistadService();
 
 export class SolicitudAmistadController {
+  constructor(
+    private service = new SolicitudAmistadService()
+  ) {}
 
 listar = async (req: Request, res: Response) => {
   const idUsuario = Number(req.params.idUsuario);
@@ -15,7 +17,7 @@ listar = async (req: Request, res: Response) => {
   }
 
   try {
-    const solicitudes = await service.listarPorUsuario(idUsuario);
+    const solicitudes = await this.service.listarPorUsuario(idUsuario);
 
     // Generar signed URL para el usuario amigo (distinto al idUsuario)
     const solicitudesConSignedUrl = await Promise.all(
@@ -57,13 +59,13 @@ listar = async (req: Request, res: Response) => {
       }
 
       // ✔ Comprobar si ya existe relación (amistad o solicitud previa)
-      const conflicto = await service.existeRelacion(usuario1Id, usuario2Id);
+      const conflicto = await this.service.existeRelacion(usuario1Id, usuario2Id);
 
       if (conflicto) {
         return res.status(400).json({ mensaje: conflicto });
       }
 
-      const solicitud = await service.crear({
+      const solicitud = await this.service.crear({
         usuario1: { id: usuario1Id } as any,
         usuario2: { id: usuario2Id } as any
       });
@@ -78,7 +80,7 @@ listar = async (req: Request, res: Response) => {
   obtener = async (req: Request, res: Response) => {
     const idSolicitud = Number(req.params.idSolicitud);
 
-    const solicitud = await service.obtener(idSolicitud);
+    const solicitud = await this.service.obtener(idSolicitud);
     if (!solicitud) return res.status(404).json({ mensaje: "Solicitud no encontrada" });
     res.json(solicitud);
   };
@@ -92,7 +94,7 @@ listar = async (req: Request, res: Response) => {
       return res.status(400).json({ mensaje: "Estado inválido" });
     }
 
-    const resultado = await service.cambiarEstado(idSolicitud, idUsuario, estado_solicitud);
+    const resultado = await this.service.cambiarEstado(idSolicitud, idUsuario, estado_solicitud);
 
     if (!resultado.ok) {
       return res.status(400).json({ mensaje: resultado.mensaje });
@@ -104,7 +106,7 @@ listar = async (req: Request, res: Response) => {
   eliminar = async (req: Request, res: Response) => {
     const idSolicitud = Number(req.params.idSolicitud);
 
-    const eliminado = await service.eliminar(idSolicitud);
+    const eliminado = await this.service.eliminar(idSolicitud);
     if (!eliminado) return res.status(404).json({ mensaje: "Solicitud no encontrada" });
 
     res.json({ mensaje: "Solicitud eliminada" });

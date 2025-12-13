@@ -1,0 +1,59 @@
+Date : 2025-12-13 18:01:08
+Directory : c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend
+Total : 21 files,  2381 codes, 127 comments, 293 blanks, all 2801 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| TypeScript JSX     |         14 |      2,311 |        126 |        283 |      2,720 |
+| JSON with Comments |          1 |         20 |          0 |          1 |         21 |
+| TypeScript         |          2 |         16 |          0 |          4 |         20 |
+| JavaScript         |          2 |         16 |          1 |          2 |         19 |
+| HTML               |          1 |         12 |          0 |          1 |         13 |
+| PostCSS            |          1 |          6 |          0 |          2 |          8 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                             | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                |         21 |      2,381 |        127 |        293 |      2,801 |
+| . (Files)                                                                                        |          4 |         48 |          1 |          4 |         53 |
+| src                                                                                              |         17 |      2,333 |        126 |        289 |      2,748 |
+| src (Files)                                                                                      |          1 |         12 |          0 |          2 |         14 |
+| src\api                                                                                          |          1 |          6 |          0 |          3 |          9 |
+| src\components                                                                                   |          4 |        115 |          6 |         28 |        149 |
+| src\pages                                                                                        |          8 |      2,121 |        119 |        247 |      2,487 |
+| src\routes                                                                                       |          1 |         63 |          1 |          6 |         70 |
+| src\styles                                                                                       |          1 |          6 |          0 |          2 |          8 |
+| src\utils                                                                                        |          1 |         10 |          0 |          1 |         11 |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                                         | language           | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\index.html                        | HTML               |         12 |          0 |          1 |         13 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\postcss.config.js                 | JavaScript         |          6 |          0 |          1 |          7 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\api\index.ts                  | TypeScript         |          6 |          0 |          3 |          9 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\components\Footer.tsx         | TypeScript JSX     |          7 |          0 |          3 |         10 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\components\MainLayout.tsx     | TypeScript JSX     |         13 |          1 |          3 |         17 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\components\ProtectedRoute.tsx | TypeScript JSX     |         13 |          0 |          6 |         19 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\components\SideBar.tsx        | TypeScript JSX     |         82 |          5 |         16 |        103 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\main.tsx                      | TypeScript JSX     |         12 |          0 |          2 |         14 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\pages\Amigos.tsx              | TypeScript JSX     |        338 |          6 |         28 |        372 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\pages\Degustaciones.tsx       | TypeScript JSX     |        653 |         53 |         64 |        770 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\pages\Galardones.tsx          | TypeScript JSX     |        159 |          3 |         17 |        179 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\pages\Home.tsx                | TypeScript JSX     |        317 |         47 |         62 |        426 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\pages\Login.tsx               | TypeScript JSX     |         79 |          1 |         10 |         90 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\pages\Profile.tsx             | TypeScript JSX     |        292 |          4 |         33 |        329 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\pages\Register.tsx            | TypeScript JSX     |        235 |          4 |         27 |        266 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\pages\VerifyEmail.tsx         | TypeScript JSX     |         48 |          1 |          6 |         55 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\routes\AppRoutes.tsx          | TypeScript JSX     |         63 |          1 |          6 |         70 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\styles\globals.css            | PostCSS            |          6 |          0 |          2 |          8 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\src\utils\validators.ts           | TypeScript         |         10 |          0 |          1 |         11 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\tailwind.config.js                | JavaScript         |         10 |          1 |          1 |         12 |
+| c:\Users\sergi\Documents\7ºCuatri\IS2\Proyecto\BeerSP\frontend\tsconfig.json                     | JSON with Comments |         20 |          0 |          1 |         21 |
+| Total                                                                                            |                    |      2,381 |        127 |        293 |      2,801 |
++--------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

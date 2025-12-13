@@ -1,123 +1,281 @@
-// src/tests/integration/integracion.test.ts
-import { mockRequest, mockResponse } from './../utils/expressMocks';
-import { UsuarioController } from '../../controllers/UsuarioController';
-import { CervezaController } from '../../controllers/CervezaController';
-import { LocalController } from '../../controllers/LocalController';
-import { DegustacionController } from '../../controllers/DegustacionController';
-import { SolicitudAmistadController } from '../../controllers/SolicitudAmistadController';
+// src/tests/general.test.ts
+import axios from "axios";
 
-// -------------------
-// FAKE REPO GLOBAL
-// -------------------
-const fakeRepo = {
-  create: jest.fn(),
-  save: jest.fn(),
-  findOne: jest.fn(),
-  remove: jest.fn(),
-};
+const api = axios.create({
+  baseURL: "http://localhost:4000/api",
+  withCredentials: true,
+});
 
-// -------------------
-// CONTROLLERS
-// -------------------
-const usuarioCtrl = new UsuarioController();
-const cervezaCtrl = new CervezaController();
-const localCtrl = new LocalController();
-const degustacionCtrl = new DegustacionController();
-const solicitudCtrl = new SolicitudAmistadController();
+// -------------------------
+// Interfaces de los modelos
+// -------------------------
+interface Usuario {
+  id: number;
+  nombre_usuario: string;
+  correo: string;
+  nombre?: string;
+}
 
-describe('Pruebas de integración - flujo completo', () => {
+interface Cerveza {
+  id: number;
+  nombre_cerveza: string;
+  estilo: string;
+  pais_procedencia: string;
+  size: string;
+  formato: string;
+  porcentaje_alcohol: number;
+  amargor: number;
+  color: string;
+  descripcion?: string;
+}
+
+interface Local {
+  id: number;
+  nombre_local: string;
+  direccion: string;
+}
+
+interface Degustacion {
+  id: number;
+  usuario_id?: number;
+  cerveza_id?: number;
+  local_id?: number;
+  puntuacion?: number;
+  comentario?: string;
+  pais_degustacion?: string;
+  me_gusta?: boolean;
+}
+
+interface SolicitudAmistad {
+  id: number;
+  usuario1: number;
+  usuario2: number;
+  estado_solicitud: "pendiente" | "aceptada" | "rechazada" | "cancelada";
+}
+
+// -------------------------
+// Tests generales
+// -------------------------
+describe("Pruebas generales del sistema", () => {
   let usuarioId: number;
   let cervezaId: number;
   let localId: number;
   let degustacionId: number;
   let solicitudId: number;
 
-  beforeEach(() => {
-    jest.clearAllMocks();
+  // ---------- USUARIOS ----------
+  it("Crear usuario", async () => {
+    const res = await api.post<Usuario>("/usuarios", {
+      nombre_usuario: "testuser",
+      correo: "testuser@example.com",
+      password: "123456",
+    });
+    expect(res.status).toBe(201);
+    expect(res.data.id).toBeDefined();
+    usuarioId = res.data.id;
   });
 
-  it('flujo completo: usuario -> cerveza -> local -> degustación -> solicitud', async () => {
-    // ---------- USUARIO ----------
-    const userPayload = { nombre_usuario: 'sysuser', correo: 'sysuser@example.com', password: '123' };
-    fakeRepo.create.mockReturnValue(userPayload);
-    fakeRepo.save.mockResolvedValue({ id: 1, ...userPayload });
-    const reqUser = mockRequest({ body: userPayload });
-    const resUser = mockResponse();
+  it("Listar usuarios", async () => {
+    const res = await api.get<Usuario[]>("/usuarios");
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.data)).toBe(true);
+  });
 
-    await usuarioCtrl.crearUsuario(reqUser, resUser);
-    usuarioId = resUser.json.mock.calls[0][0].id;
+  it("Actualizar usuario", async () => {
+    const res = await api.put<Usuario>(`/usuarios/${usuarioId}`, {
+      nombre: "Nombre Test",
+    });
+    expect(res.status).toBe(200);
+    expect(res.data.nombre).toBe("Nombre Test");
+  });
 
-    // ---------- CERVEZA ----------
-    const beerPayload = {
-      nombre_cerveza: 'Sistema Cerveza',
-      estilo: 'IPA',
-      pais_procedencia: 'ES',
-      size: '500ml',
-      formato: 'Botella',
+  // ---------- CERVEZAS ----------
+  it("Crear cerveza", async () => {
+    const res = await api.post<Cerveza>("/cervezas", {
+      nombre_cerveza: "Test Cerveza",
+      estilo: "IPA",
+      pais_procedencia: "España",
+      size: "500ml",
+      formato: "Botella",
       porcentaje_alcohol: 5,
       amargor: 40,
-      color: 'Ambar',
-    };
-    fakeRepo.create.mockReturnValue(beerPayload);
-    fakeRepo.save.mockResolvedValue({ id: 1, ...beerPayload });
-    const reqBeer = mockRequest({ body: beerPayload });
-    const resBeer = mockResponse();
+      color: "Ambar",
+      descripcion: "Cerveza de prueba",
+    });
+    expect(res.status).toBe(201);
+    expect(res.data.id).toBeDefined();
+    cervezaId = res.data.id;
+  });
 
-    await cervezaCtrl.crear(reqBeer, resBeer);
-    cervezaId = resBeer.json.mock.calls[0][0].id;
+  it("Listar cervezas", async () => {
+    const res = await api.get<Cerveza[]>("/cervezas");
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.data)).toBe(true);
+  });
 
-    // ---------- LOCAL ----------
-    const localPayload = { nombre_local: 'Sistema Bar', direccion: 'Calle Principal 1' };
-    fakeRepo.create.mockReturnValue(localPayload);
-    fakeRepo.save.mockResolvedValue({ id: 1, ...localPayload });
-    const reqLocal = mockRequest({ body: localPayload });
-    const resLocal = mockResponse();
+  it("Actualizar cerveza", async () => {
+    const res = await api.put<Cerveza>(`/cervezas/${cervezaId}`, {
+      estilo: "Lager",
+    });
+    expect(res.status).toBe(200);
+    expect(res.data.estilo).toBe("Lager");
+  });
 
-    await localCtrl.crear(reqLocal, resLocal);
-    localId = resLocal.json.mock.calls[0][0].id;
+  // ---------- LOCALES ----------
+  it("Crear local", async () => {
+    const res = await api.post<Local>("/locales", {
+      nombre_local: "Local Test",
+      direccion: "Calle Falsa 123",
+    });
+    expect(res.status).toBe(201);
+    expect(res.data.id).toBeDefined();
+    localId = res.data.id;
+  });
 
-    // ---------- DEGUSTACIÓN ----------
-    const degPayload = {
+  it("Listar locales", async () => {
+    const res = await api.get<Local[]>("/locales");
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.data)).toBe(true);
+  });
+
+  it("Actualizar local", async () => {
+    const res = await api.put<Local>(`/locales/${localId}`, {
+      direccion: "Nueva Dirección 456",
+    });
+    expect(res.status).toBe(200);
+    expect(res.data.direccion).toBe("Nueva Dirección 456");
+  });
+
+  // ---------- DEGUSTACIONES ----------
+  it("Crear degustación", async () => {
+    const res = await api.post<Degustacion>("/degustaciones", {
       usuario_id: usuarioId,
       cerveza_id: cervezaId,
       local_id: localId,
-      puntuacion: 10,
-      comentario: 'Excelente',
-      pais_degustacion: 'ES',
+      puntuacion: 8,
+      comentario: "Muy buena",
+      pais_degustacion: "España",
       me_gusta: true,
-    };
-    fakeRepo.create.mockReturnValue(degPayload);
-    fakeRepo.save.mockResolvedValue({ id: 1, ...degPayload });
-    const reqDeg = mockRequest({ body: degPayload });
-    const resDeg = mockResponse();
-
-    await degustacionCtrl.crear(reqDeg, resDeg);
-    degustacionId = resDeg.json.mock.calls[0][0].id;
-
-    // ---------- SOLICITUD DE AMISTAD ----------
-    const solPayload = { usuario1: usuarioId, usuario2: usuarioId + 1, estado_solicitud: 'pendiente' };
-    fakeRepo.create.mockReturnValue(solPayload);
-    fakeRepo.save.mockResolvedValue({ id: 1, ...solPayload });
-    const reqSol = mockRequest({ body: solPayload, params: { idUsuario: usuarioId } });
-    const resSol = mockResponse();
-
-    await solicitudCtrl.crear(reqSol, resSol);
-    solicitudId = resSol.json.mock.calls[0][0].id;
-
-    // ---------- EXPECTS ----------
-    expect(resUser.status).toHaveBeenCalledWith(201);
-    expect(resBeer.status).toHaveBeenCalledWith(201);
-    expect(resLocal.status).toHaveBeenCalledWith(201);
-    expect(resDeg.status).toHaveBeenCalledWith(201);
-    expect(resSol.status).toHaveBeenCalledWith(201);
+    });
+    expect(res.status).toBe(201);
+    expect(res.data.id).toBeDefined();
+    degustacionId = res.data.id;
   });
 
+  it("Listar degustaciones", async () => {
+    const res = await api.get<Degustacion[]>("/degustaciones");
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.data)).toBe(true);
+  });
+
+  it("Actualizar degustación", async () => {
+    const res = await api.put<Degustacion>(`/degustaciones/${degustacionId}`, {
+      puntuacion: 9,
+    });
+    expect(res.status).toBe(200);
+    expect(res.data.puntuacion).toBe(9);
+  });
+
+  // ---------- SOLICITUDES AMISTAD ----------
+  it("Crear solicitud de amistad", async () => {
+    const res = await api.post<SolicitudAmistad>("/solicitudes", {
+      usuario1: usuarioId,
+      usuario2: usuarioId,
+      estado_solicitud: "pendiente",
+    });
+    expect(res.status).toBe(201);
+    expect(res.data.id).toBeDefined();
+    solicitudId = res.data.id;
+  });
+
+  it("Listar solicitudes de amistad", async () => {
+    const res = await api.get<SolicitudAmistad[]>("/solicitudes");
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.data)).toBe(true);
+  });
+
+  it("Actualizar solicitud de amistad", async () => {
+    const res = await api.put<SolicitudAmistad>(`/solicitudes/${solicitudId}`, {
+      estado_solicitud: "aceptada",
+    });
+    expect(res.status).toBe(200);
+    expect(res.data.estado_solicitud).toBe("aceptada");
+  });
+
+  // ---------- PRUEBA DE SISTEMA ----------
+  it("Flujo completo: usuario -> cerveza -> local -> degustación -> solicitud", async () => {
+    // Crear usuario nuevo
+    const userRes = await api.post<Usuario>("/usuarios", {
+      nombre_usuario: "sysuser",
+      correo: "sysuser@example.com",
+      password: "abcdef",
+    });
+    expect(userRes.status).toBe(201);
+    const userId = userRes.data.id;
+
+    // Crear cerveza
+    const beerRes = await api.post<Cerveza>("/cervezas", {
+      nombre_cerveza: "Sistema Cerveza",
+      estilo: "Stout",
+      pais_procedencia: "Alemania",
+      size: "330ml",
+      formato: "Lata",
+      porcentaje_alcohol: 6,
+      amargor: 35,
+      color: "Oscuro",
+    });
+    expect(beerRes.status).toBe(201);
+    const beerId = beerRes.data.id;
+
+    // Crear local
+    const localRes = await api.post<Local>("/locales", {
+      nombre_local: "Sistema Bar",
+      direccion: "Calle Principal 1",
+    });
+    expect(localRes.status).toBe(201);
+    const localId = localRes.data.id;
+
+    // Registrar degustación
+    const degRes = await api.post<Degustacion>("/degustaciones", {
+      usuario_id: userId,
+      cerveza_id: beerId,
+      local_id: localId,
+      puntuacion: 10,
+      comentario: "Excelente",
+      pais_degustacion: "Alemania",
+      me_gusta: true,
+    });
+    expect(degRes.status).toBe(201);
+    expect(degRes.data.usuario_id).toBe(userId);
+    expect(degRes.data.cerveza_id).toBe(beerId);
+    expect(degRes.data.local_id).toBe(localId);
+    const degId = degRes.data.id;
+
+    // Crear solicitud de amistad entre usuario nuevo y usuario original
+    const solRes = await api.post<SolicitudAmistad>("/solicitudes", {
+      usuario1: userId,
+      usuario2: usuarioId,
+      estado_solicitud: "pendiente",
+    });
+    expect(solRes.status).toBe(201);
+    expect(solRes.data.usuario1).toBe(userId);
+    expect(solRes.data.usuario2).toBe(usuarioId);
+    const solId = solRes.data.id;
+
+    // Limpieza de datos
+    await api.delete(`/degustaciones/${degId}`);
+    await api.delete(`/solicitudes/${solId}`);
+    await api.delete(`/locales/${localId}`);
+    await api.delete(`/cervezas/${beerId}`);
+    await api.delete(`/usuarios/${userId}`);
+  });
+
+  // ---------- LIMPIEZA DE DATOS ----------
   afterAll(async () => {
-    // Simula borrado
-    if (degustacionId) await fakeRepo.remove({ id: degustacionId });
-    if (solicitudId) await fakeRepo.remove({ id: solicitudId });
-    if (localId) await fakeRepo.remove({ id: localId });
-    if (cervezaId) await fakeRepo.remove({ id: cervezaId });
-    if (usuarioId) await fakeRepo.remove({ id: usuarioId });
+    if (degustacionId) await api.delete(`/degustaciones/${degustacionId}`);
+    if (solicitudId) await api.delete(`/solicitudes/${solicitudId}`);
+    if (localId) await api.delete(`/locales/${localId}`);
+    if (cervezaId) await api.delete(`/cervezas/${cervezaId}`);
+    if (usuarioId) await api.delete(`/usuarios/${usuarioId}`);
   });
 });

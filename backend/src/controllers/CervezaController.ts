@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import { CervezaService } from "../services/CervezaService";
 import { generateSignedUrl } from "../files/r2SignedUrl";
 
-const service = new CervezaService();
 
 export class CervezaController {
+   constructor(
+    private service = new CervezaService()
+  ) {}
   crear = async (req: Request, res: Response) => {
     try {
       // Convierte los campos numéricos de string a number si es necesario
@@ -18,18 +20,18 @@ export class CervezaController {
       if (req.file) {
         nuevaCerveza.foto = (req.file as any).key; // Guardamos el key, no la URL
       }
-      const cerveza = await service.crear(nuevaCerveza);
+      const cerveza = await this.service.crear(nuevaCerveza);
 
       res.status(201).json(cerveza);
     } catch (error: any) {
       console.error("Error al crear cerveza:", error);
-      res.status(500).json({ mensaje: "Error al crear cerveza", error: error.message });
+      res.status(400).json({ mensaje: "Error al crear cerveza", error: error.message });
     }
   };
 
   listar = async (req: Request, res: Response) => {
     try {
-      const cervezas = await service.listar();
+      const cervezas = await this.service.listar();
 
       // --- INICIO DE LA MODIFICACIÓN ---
       // Usamos Promise.all para esperar a que todas las URLs se generen
@@ -50,13 +52,13 @@ export class CervezaController {
       res.json(cervezasConUrl); // Enviamos la lista ya procesada
     } catch (error: any) {
       console.error("Error al listar cervezas:", error);
-      res.status(500).json({ mensaje: "Error al listar cervezas", error });
+      res.status(400).json({ mensaje: "Error al listar cervezas", error });
     }
   };
 
   obtener = async (req: Request, res: Response) => {
     try {
-      const cerveza = await service.obtener(Number(req.params.id));
+      const cerveza = await this.service.obtener(Number(req.params.id));
       if (!cerveza) {
         return res.status(404).json({ mensaje: "Cerveza no encontrada" });
       }
@@ -66,7 +68,7 @@ export class CervezaController {
       res.json(cerveza);
     } catch (error: any) {
       console.error("Error al obtener cerveza:", error);
-      res.status(500).json({
+      res.status(400).json({
         mensaje: "Error al obtener cerveza",
         error: error.message,
       });
@@ -77,7 +79,7 @@ export class CervezaController {
     try {
       console.log("REQ.BODY actualizar:", req.body);
 
-      const cerveza = await service.actualizar(Number(req.params.id), req.body);
+      const cerveza = await this.service.actualizar(Number(req.params.id), req.body);
 
       if (!cerveza) {
         return res.status(404).json({ mensaje: "Cerveza no encontrada" });
@@ -86,7 +88,7 @@ export class CervezaController {
       res.json(cerveza);
     } catch (error: any) {
       console.error("Error al actualizar cerveza:", error);
-      res.status(500).json({
+      res.status(400).json({
         mensaje: "Error al actualizar cerveza",
         error: error.message,
       });
@@ -95,14 +97,14 @@ export class CervezaController {
 
   eliminar = async (req: Request, res: Response) => {
     try {
-      const eliminado = await service.eliminar(Number(req.params.id));
+      const eliminado = await this.service.eliminar(Number(req.params.id));
       if (!eliminado) {
         return res.status(404).json({ mensaje: "Cerveza no encontrada" });
       }
       res.json({ mensaje: "Cerveza eliminada" });
     } catch (error: any) {
       console.error("Error al eliminar cerveza:", error);
-      res.status(500).json({
+      res.status(400).json({
         mensaje: "Error al eliminar cerveza",
         error: error.message,
       });

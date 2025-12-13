@@ -1,11 +1,13 @@
 import { mockRequest, mockResponse } from '../utils/expressMocks';
 import { SolicitudAmistadController } from '../../controllers/SolicitudAmistadController';
 import { SolicitudAmistadService } from '../../services/SolicitudAmistadService';
+import { Usuario } from '../../models/Usuario';
+import { SolicitudAmistad } from '../../models/SolicitudAmistad';
 
 jest.mock('../../services/SolicitudAmistadService');
 
 const solicitudServiceMock = new SolicitudAmistadService() as jest.Mocked<SolicitudAmistadService>;
-const controller = new SolicitudAmistadController();
+const controller = new SolicitudAmistadController(solicitudServiceMock);
 
 describe('SolicitudAmistadController - unit', () => {
   beforeEach(() => {
@@ -17,13 +19,17 @@ describe('SolicitudAmistadController - unit', () => {
     const res = mockResponse();
 
     solicitudServiceMock.listarPorUsuario.mockResolvedValue([
-      { id: 1, usuario1: { id: 1, foto: null }, usuario2: { id: 2, foto: null } }
+      {
+        id: 1,
+        usuario1: { id: 1 } as Partial<Usuario>,
+        usuario2: { id: 2 } as Partial<Usuario>
+      } as SolicitudAmistad
     ]);
 
     await controller.listar(req, res);
 
     expect(res.json).toHaveBeenCalledWith([
-      { id: 1, usuario1: { id: 1, foto: null }, usuario2: { id: 2, foto: null } }
+      { id: 1, usuario1: { id: 1 }, usuario2: { id: 2 } }
     ]);
   });
 
@@ -31,13 +37,14 @@ describe('SolicitudAmistadController - unit', () => {
     const req = mockRequest({ params: { idUsuario: 1 }, body: { usuario2: 2 } });
     const res = mockResponse();
 
-    solicitudServiceMock.existeRelacion.mockResolvedValue(false);
+    solicitudServiceMock.existeRelacion.mockResolvedValue(null);
     solicitudServiceMock.crear.mockResolvedValue({
       id: 1,
       estado_solicitud: 'pendiente',
-      usuario1: { id: 1 },
-      usuario2: { id: 2 }
-    });
+      usuario1: { id: 1 } as Partial<Usuario>,
+      usuario2: { id: 2 } as Partial<Usuario>
+    } as any);
+
 
     await controller.crear(req, res);
 

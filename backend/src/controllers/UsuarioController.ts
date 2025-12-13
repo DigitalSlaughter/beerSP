@@ -4,10 +4,12 @@ import { generateSignedUrl } from "../files/r2SignedUrl";
 import { GalardonService } from "../services/GalardonService";
 import { UsuarioRepository } from "../repositories/UsuarioRepository";
 
-const galardonService = new GalardonService();
-const usuarioService = new UsuarioService();
 
 export class UsuarioController {
+  constructor(
+    private usuarioService = new UsuarioService(),
+    private galardonService = new GalardonService()
+  ) { }
   async crearUsuario(req: Request, res: Response) {
     try {
       // 1. Tomamos los campos del body
@@ -21,10 +23,10 @@ export class UsuarioController {
       console.log("[UsuarioController] Petición para crear usuario:", usuarioData);
 
       // 3. Crear usuario
-      const usuario = await usuarioService.crearUsuario(usuarioData);
+      const usuario = await this.usuarioService.crearUsuario(usuarioData);
 
       // 4. Asignar galardón de creación de cuenta
-      await galardonService.asignarGalardonEvento(usuario, "crear_cuenta");
+      await this.galardonService.asignarGalardonEvento(usuario, "crear_cuenta");
 
       // 5. Recargar usuario con galardones para devolverlo completo
       const usuarioConGalardones = await UsuarioRepository.findOne({
@@ -59,7 +61,7 @@ export class UsuarioController {
     }
 
     try {
-      const degustaciones = await usuarioService.listarDegustacionesUsuario(usuarioId);
+      const degustaciones = await this.usuarioService.listarDegustacionesUsuario(usuarioId);
 
       if (!degustaciones) {
         console.warn("[listarDegustaciones] Usuario no encontrado con ID:", usuarioId);
@@ -80,7 +82,7 @@ export class UsuarioController {
       console.warn("[listarDegustaciones] ID de usuario inválido");
       return res.status(400).json({ mensaje: "ID de usuario inválido" });
     }
-    const usuario = await usuarioService.obtenerUsuarioPorId(usuarioId);
+    const usuario = await this.usuarioService.obtenerUsuarioPorId(usuarioId);
 
     if (!usuario)
       return res.status(404).json({ mensaje: "Usuario no encontrado" });
@@ -98,7 +100,7 @@ export class UsuarioController {
     if (isNaN(usuarioId)) {
       console.warn("[listarDegustaciones] ID de usuario inválido");
       return res.status(400).json({ mensaje: "ID de usuario inválido" });
-    } 
+    }
     const datos: any = { ...req.body };
 
     // Nueva imagen subida → guardar la nueva key
@@ -106,7 +108,7 @@ export class UsuarioController {
       datos.foto = (req.file as any).key;
     }
 
-    const usuario = await usuarioService.actualizarUsuario(usuarioId, datos);
+    const usuario = await this.usuarioService.actualizarUsuario(usuarioId, datos);
     if (!usuario)
       return res.status(404).json({ error: "Usuario no encontrado" });
 
@@ -125,28 +127,28 @@ export class UsuarioController {
       console.warn("[listarDegustaciones] ID de usuario inválido");
       return res.status(400).json({ mensaje: "ID de usuario inválido" });
     }
-    const eliminado = await usuarioService.eliminarUsuario(usuarioId);
+    const eliminado = await this.usuarioService.eliminarUsuario(usuarioId);
 
     if (!eliminado) return res.status(404).json({ mensaje: "Usuario no encontrado" });
 
     res.json({ mensaje: "Usuario eliminado" });
   }
 
- async listarUsuarios(req: Request, res: Response) {
-  const usuarios = await usuarioService.listarUsuarios();
+  async listarUsuarios(req: Request, res: Response) {
+    const usuarios = await this.usuarioService.listarUsuarios();
 
-  // Generar signed URL si tienen foto
-  const usuariosConFoto = await Promise.all(
-    usuarios.map(async (u) => {
-      if (u.foto) {
-        u.foto = await generateSignedUrl(u.foto);
-      }
-      return u;
-    })
-  );
+    // Generar signed URL si tienen foto
+    const usuariosConFoto = await Promise.all(
+      usuarios.map(async (u) => {
+        if (u.foto) {
+          u.foto = await generateSignedUrl(u.foto);
+        }
+        return u;
+      })
+    );
 
-  res.json(usuariosConFoto);
-}
+    res.json(usuariosConFoto);
+  }
 
 
   // -----------------------------
@@ -156,7 +158,7 @@ export class UsuarioController {
     const { token } = req.params;
 
     try {
-      const usuario = await usuarioService.verificarUsuario(token);
+      const usuario = await this.usuarioService.verificarUsuario(token);
 
       res.json({
         mensaje: "Cuenta verificada correctamente",
@@ -174,7 +176,7 @@ export class UsuarioController {
     const { correo } = req.body;
 
     try {
-      await usuarioService.reenviarEmailVerificacion(correo);
+      await this.usuarioService.reenviarEmailVerificacion(correo);
 
       res.json({ mensaje: "Correo de verificación enviado correctamente" });
     } catch (error: any) {
@@ -185,25 +187,25 @@ export class UsuarioController {
     }
   }
   async recuperarContrasena(req: Request, res: Response) {
-  const { correo } = req.body;
+    const { correo } = req.body;
 
-  if (!correo) {
-    return res.status(400).json({ mensaje: "Correo requerido" });
+    if (!correo) {
+      return res.status(400).json({ mensaje: "Correo requerido" });
+    }
+
+    try {
+      await this.usuarioService.enviarContrasenaPorCorreo(correo);
+
+      res.json({
+        mensaje: "La contraseña ha sido enviada al correo proporcionado"
+      });
+    } catch (error: any) {
+      console.error("[recuperarContrasena]", error.message);
+      res.status(404).json({ mensaje: error.message });
+    }
   }
 
-  try {
-    await usuarioService.enviarContrasenaPorCorreo(correo);
 
-    res.json({
-      mensaje: "La contraseña ha sido enviada al correo proporcionado"
-    });
-  } catch (error: any) {
-    console.error("[recuperarContrasena]", error.message);
-    res.status(404).json({ mensaje: error.message });
-  }
-}
-
-  
   async obtenerGalardones(req: Request, res: Response) {
     const usuarioId = Number(req.params.idUsuario);
 
@@ -232,9 +234,9 @@ export class UsuarioController {
       const asignados = usuario.galardonesAsignados ?? [];
 
       // ← progreso real basado en relaciones cargadas
-      const progresoReal = await galardonService.obtenerProgresoActual(usuario);
+      const progresoReal = await this.galardonService.obtenerProgresoActual(usuario);
 
-      const catalogo = galardonService.getCatalogo();
+      const catalogo = this.galardonService.getCatalogo();
 
       const respuesta = catalogo.map((g) => {
         const asignado = asignados.find((ag) => ag.galardonId === g.id);
@@ -242,7 +244,7 @@ export class UsuarioController {
         const cantidadReal = progresoReal[g.id] ?? 0;
 
         // progreso hacia siguiente nivel
-        const progreso = galardonService.calcularProgreso(cantidadReal, g);
+        const progreso = this.galardonService.calcularProgreso(cantidadReal, g);
 
         return {
           id: g.id,
